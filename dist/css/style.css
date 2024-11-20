@@ -2,10 +2,11 @@
 
 /* Tema por defecto (light) */
 :root {
-    --background-color: #ADBFFF;
+    --background-color: #f1fcff;
     --text-color: #0c0c0e;
-    --nav-background: #0d0f113b;
-    --nav-hover-color: #fafafa;
+    --nav-background: #b7babb3b;
+    --primary-blue-bt: #0d6efd;
+    --nav-hover-bg: #9c9c9cb0;
     --border-color: #b7b7b7;
 }
 
@@ -14,7 +15,6 @@ body.dark {
     --background-color: #1c1c1c;
     --text-color: #f5f5f5;
     --nav-background: #2d2d2d;
-    --nav-hover-color: #3a3a3a;
     --border-color: #444;
 }
 
@@ -90,7 +90,7 @@ nav ul li button {
 }
 
 nav ul li button:hover {
-    color: var(--nav-hover-color);
+    color: var(--primary-blue-bt);
 }
 
 nav ul li button i {
@@ -110,11 +110,14 @@ nav ul .spacer {
     padding: 0.4rem;
     border: 1px solid var(--border-color);
     border-radius: 16px;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    transition: 0.3s ease;
 }
 
 .btn-search:hover {
-    background-color: var(--nav-hover-color);
+    transform: scale(1.02);
+    font-weight:600;
+    border: 1px solid var(--primary-blue-bt);
+    background: #20283311;
 }
 
 .btn-srch-left {
@@ -154,7 +157,7 @@ nav ul .spacer {
 }
 
 .menu-toggle .bx-dots-vertical-rounded:hover {
-    background-color: var(--nav-hover-color);
+    background-color: var(--nav-hover-bg);
 }
 
 .menu-toggle .dropdown-menu {
@@ -174,6 +177,7 @@ nav ul .spacer {
 .menu-toggle .dropdown-menu button {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     padding: 0.5rem;
     color: var(--text-color);
@@ -185,7 +189,6 @@ nav ul .spacer {
 }
 
 .menu-toggle .dropdown-menu button:hover {
-    background-color: var(--nav-hover-color);
     color: var(--text-color);
 }
 
@@ -237,7 +240,7 @@ nav ul .spacer {
     border: none;
     cursor: pointer;
     color: var(--text-color);
-    transition: background-color 0.3s ease;
+    transition: 0.3s ease;
     display: flex;
     align-items: center;
     padding: 0.2rem;
@@ -245,7 +248,7 @@ nav ul .spacer {
 }
 
 .icon-search-responsive .bx-search:hover {
-    background-color: var(--nav-hover-color);
+    background-color: var(--nav-hover-bg);
 }
 
 @media (max-width: 767px) {
@@ -290,4 +293,51 @@ nav ul .spacer {
         left: 50%;
         transform: translateX(-50%);
     }
+}
+
+.content-body{
+    margin-top: 5rem;
+}
+
+.recommended-group{
+    display: flex;
+    height: 5.5rem;
+    gap: .9rem;
+    padding: 0 .8rem;
+    overflow: auto;
+    overflow-y: hidden;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+.recommended{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: .2rem;
+}
+
+.recommended img{
+    height: 80%;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: .3s ease;
+
+}
+
+.recommended img:hover{
+    transform: scale(1.2);
+}
+
+.recommended p {
+    font-size: clamp(10px, 2vw, 12px);
+    display: flex;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60px;
+    text-align: center;
 }
