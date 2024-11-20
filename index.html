@@ -3,18 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Foro</title>
+    <link rel="stylesheet" href="dist/css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
+    <!-- Menú -->
     <nav>
         <ul>
-            <li>Logo</li>
-            <li>Op1</li>
-            <li>Op2</li>
-            <li>Op3</li>
-            <li>Buscar</li>
-            <li>Perfil</li>
+            <div class="left-group">
+                <li><img src="dist/img/logo.webp" alt="logos"></li>
+                <li class="btns-content">
+                    <button>Para ti</button>
+                    <button>Siguiendo</button>
+                </li>
+            </div>
+    
+            <div class="spacer"></div>
+    
+            <div class="right-group">
+                <li class="search-container">
+                    <button class="btn-search">
+                        <div class="btn-srch-right">
+                            <i class='bx bx-search'></i> Buscar
+                        </div>
+                        <div class="btn-srch-left">
+                            <div class="wnd">
+                                <i class='bx bxl-windows'></i>
+                            </div>
+                            <div class="wnd">
+                                <p>K</p>
+                            </div>
+                        </div>
+                    </button>
+                </li>
+                <li class="icon-search-responsive">
+                    <button><i class='bx bx-search'></i></button>
+                </li>
+                <li class="menu-items"><button><i class='bx bx-sun'></i></button></li>
+                <li class="menu-items"><button><i class='bx bx-user'></i></button></li>
+                <li class="menu-items"><button><i class='bx bx-cog'></i></button></li>
+                <li class="menu-toggle">
+                    <button><i class='bx bx-dots-vertical-rounded'></i></button>
+                    <div class="dropdown-menu">
+                        <a href="#"><i class='bx bx-user'></i> User</a>
+                        <a href="#"><i class='bx bx-cog'></i> Ajustes</a>
+                        <a href="#"><i class='bx bx-log-out'></i> Cerrar sesión</a>
+                        <a href="#"><i class='bx bx-sun'></i> Tema</a>
+                    </div>
+                </li>
+            </div>
         </ul>
-    </nav>
+    </nav>    
+
+    <!-- Contenido -->
+    <div class="content-body"></div>
+
+    <!-- Scripts -->
+    <script src="dist/js/app.js"></script>
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 </body>
 </html>
