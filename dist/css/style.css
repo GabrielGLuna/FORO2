@@ -2,19 +2,21 @@
 
 /* Tema por defecto (light) */
 :root {
-    --background-color: #ADBFFF;
+    --background-color: #f1fcff;
     --text-color: #0c0c0e;
-    --nav-background: #0d0f113b;
-    --nav-hover-color: #fafafa;
+    --nav-background: #b7babb3b;
+    --primary-blue-bt: #0d6efd;
+    --nav-hover-bg: #9c9c9cb0;
     --border-color: #b7b7b7;
+    --success-bt: #198754;
+    --danger-bt: #dc3545;
 }
 
 /* Tema oscuro */
 body.dark {
     --background-color: #1c1c1c;
     --text-color: #f5f5f5;
-    --nav-background: #2d2d2d;
-    --nav-hover-color: #3a3a3a;
+    --nav-background: #2d2d2d73;
     --border-color: #444;
 }
 
@@ -41,6 +43,7 @@ nav {
     width: 100%;
     background-color: var(--nav-background);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     transition: background-color 0.3s ease;
@@ -90,7 +93,7 @@ nav ul li button {
 }
 
 nav ul li button:hover {
-    color: var(--nav-hover-color);
+    color: var(--primary-blue-bt);
 }
 
 nav ul li button i {
@@ -110,11 +113,14 @@ nav ul .spacer {
     padding: 0.4rem;
     border: 1px solid var(--border-color);
     border-radius: 16px;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    transition: 0.3s ease;
 }
 
 .btn-search:hover {
-    background-color: var(--nav-hover-color);
+    transform: scale(1.02);
+    font-weight:600;
+    border: 1px solid var(--primary-blue-bt);
+    background: #20283311;
 }
 
 .btn-srch-left {
@@ -154,7 +160,7 @@ nav ul .spacer {
 }
 
 .menu-toggle .bx-dots-vertical-rounded:hover {
-    background-color: var(--nav-hover-color);
+    background-color: var(--nav-hover-bg);
 }
 
 .menu-toggle .dropdown-menu {
@@ -174,6 +180,7 @@ nav ul .spacer {
 .menu-toggle .dropdown-menu button {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     padding: 0.5rem;
     color: var(--text-color);
@@ -185,7 +192,6 @@ nav ul .spacer {
 }
 
 .menu-toggle .dropdown-menu button:hover {
-    background-color: var(--nav-hover-color);
     color: var(--text-color);
 }
 
@@ -237,7 +243,7 @@ nav ul .spacer {
     border: none;
     cursor: pointer;
     color: var(--text-color);
-    transition: background-color 0.3s ease;
+    transition: 0.3s ease;
     display: flex;
     align-items: center;
     padding: 0.2rem;
@@ -245,7 +251,7 @@ nav ul .spacer {
 }
 
 .icon-search-responsive .bx-search:hover {
-    background-color: var(--nav-hover-color);
+    background-color: var(--nav-hover-bg);
 }
 
 @media (max-width: 767px) {
@@ -310,4 +316,241 @@ nav ul .spacer {
     display: flex;
     flex-direction: row;
     justify-content: center;
+}
+
+.content-body{
+    margin-top: 5rem;
+}
+
+.recommended-group{
+    display: flex;
+    height: 5.7rem;
+    gap: .9rem;
+    padding: 0 .8rem;
+    overflow: auto;
+    overflow-y: hidden;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+.recommended{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: .2rem;
+}
+
+.recommended img{
+    height: 70%;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: .3s ease;
+
+}
+
+.recommended img:hover{
+    transform: scale(1.1);
+}
+
+.recommended p {
+    font-size: clamp(10px, 2vw, 12px);
+    display: flex;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60px;
+    text-align: center;
+}
+
+.channels{
+    display: flex;
+    flex-direction: column;
+    padding: .8rem;
+    gap: 1rem;
+}
+
+.channels h1{
+    font-size: clamp(18px, 2vw, 22px);
+}
+
+.container-channels{
+    display: flex;
+    justify-content: space-evenly;
+    gap: .6rem;
+    flex-wrap: wrap;
+}
+
+.card-channel{
+    display: flex;
+    width: 14rem;
+    align-items: center;
+    background: var(--nav-background);
+    flex-direction: column;
+    border-radius: 16px;
+    padding: 8px;
+    cursor: pointer;
+    transition: .3s ease;
+}
+
+.card-channel:hover{
+    transform: scale(1.03);
+}
+
+.card-channel img{
+    width: 80%;
+    border-radius: 8px;
+}
+
+.channel-title{
+    font-size: clamp(12px, 2vw, 16px);
+    padding: 5px 15px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+}
+
+.card-actives{
+    font-size: clamp(10px, 2vw, 15px);
+    display: flex;
+    align-items: center;
+    gap: .2rem;
+}
+
+.card-actives .bx{
+    color: var(--success-bt);
+}
+
+.card-notifications {
+    font-size: clamp(10px, 2vw, 15px);
+    display: flex;
+    align-items: center;
+    gap: .2rem;
+    color: var(--danger-bt);
+    font-weight: 700;
+}
+
+.card-body{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .card-channel {
+        width: clamp(8rem, 20vw, 12rem);
+    }
+    .channel-title{
+        max-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-channel {
+        width: clamp(7rem, 25vw, 10rem);
+    }
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0.3s, opacity 0.3s;
+}
+
+.modal .modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.modal .modal-body {
+    background: var(--background-color);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    z-index: 999;
+}
+
+.modal .search-input {
+    color: var(--text-color);
+    background: none;
+    font-size: 16px;
+    padding: 0px 8px;
+    width: 100%;
+    border: none;
+    outline: none;
+}
+
+.search-input-group{
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding: 8px;
+}
+
+.search-input-group .bx{
+    font-size: 25px;
+}
+
+.close-modal{
+    border: 1px solid var(--border-color);
+    text-align: center;
+    color: var(--text-color);
+    background: none;
+    padding: 5px;
+    border-radius: 6px;
+    transition: .3s ease;
+    cursor: pointer;
+}
+
+.close-modal:hover{
+    background: var(--nav-hover-bg);
+}
+
+.modal .categories{
+    display: grid;
+    gap: .1rem;
+    padding: 2px;
+}
+
+.modal .categories p {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: .2s ease;
+    background: none;
+}
+
+.modal .categories p:hover{
+    background: var(--nav-hover-bg);
+}
+
+.modal.active {
+    visibility: visible;
+    opacity: 1;
+    background: var(--nav-background);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
