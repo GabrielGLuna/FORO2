@@ -39,3 +39,47 @@ themeToggleButtons.forEach(button => {
         setTheme(newTheme);
     });
 });
+
+// Selección de elementos
+const modal = document.getElementById('modal-search');
+const modalOverlay = document.querySelector('.modal-overlay');
+const closeModalButton = document.querySelector('.close-modal');
+const btnSearch = document.querySelector('.btn-search');
+const btnSearchResponsive = document.querySelector('.btn-search-responsive');
+const searchInput = document.querySelector('.search-input');
+
+// Función para abrir el modal
+const openModal = () => {
+    modal.classList.add('active');
+    setTimeout(() => searchInput.focus(), 50);
+};
+
+// Función para cerrar el modal
+const closeModal = () => {
+    modal.classList.remove('active');
+};
+
+// Listeners para abrir el modal
+btnSearch.addEventListener('click', openModal);
+btnSearchResponsive.addEventListener('click', openModal);
+
+// Listener para cerrar el modal con el botón [x]
+closeModalButton.addEventListener('click', closeModal);
+
+// Listener para cerrar el modal al hacer clic en el overlay
+modalOverlay.addEventListener('click', closeModal);
+
+// Listener para cerrar el modal con la tecla ESC
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        closeModal();
+    }
+});
+
+// Listener para abrir el modal con la combinación de teclas Windows + C
+document.addEventListener('keydown', (event) => {
+    if ((event.key === 'c' || event.key === 'C') && (event.ctrlKey || event.metaKey)) {
+        openModal();
+    }
+});
+
