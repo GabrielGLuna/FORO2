@@ -291,3 +291,23 @@ nav ul .spacer {
         transform: translateX(-50%);
     }
 }
+@media (max-width: 600px){
+    .chanels-group{
+        display: none;
+        background-color: #b7b7b7;
+    }
+
+}
+
+.chanels-group{
+    display: block;
+    border-color: #2e2eb53c;
+    width:25%;
+    margin-top: 5rem;
+}
+
+.super-group{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
