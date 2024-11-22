@@ -271,6 +271,14 @@ function attachDynamicEvents() {
         btn.addEventListener("click", handleLogout);
     });
 
+    // Botones de usuario (Iniciar sesión o Cuenta)
+    document.querySelectorAll(".btn-user").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const modalLogin = document.getElementById("modal-login");
+            modalLogin.style.display = "flex";
+        });
+    });
+
     // Botones de tema
     const themeToggleButtons = document.querySelectorAll('.toggle-theme');
     themeToggleButtons.forEach(button => {
