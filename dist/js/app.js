@@ -207,6 +207,7 @@ function renderMenu() {
             <li class="icon-search-responsive">
                 <button class="btn-search-responsive"><i class='bx bx-search'></i></button>
             </li>
+            <li class="menu-items"><button class="btn-addChanel"><i class='bx bx-plus-circle'></i></button></li>
             <li class="menu-items"><button class="toggle-theme"><i class='bx bx-sun'></i></button></li>
             <li class="menu-items"><button class="btn-account"><i class='bx bx-user-circle'></i></button></li>
             <li class="menu-items"><button class="btn-logout"><i class='bx bx-log-out'></i></button></li>
@@ -214,6 +215,7 @@ function renderMenu() {
                 <button><i class='bx bx-dots-vertical-rounded'></i></button>
                 <div class="dropdown-menu">
                     <button class="btn-account"><i class='bx bx-user-circle'></i> Cuenta</button>
+                    <button class="btn-account"><i class='bx bx-plus-circle'></i> Crear Canal</button>
                     <button class="btn-logout"><i class='bx bx-log-out'></i> Logout</button>
                     <button class="toggle-theme"><i class='bx bx-sun'></i> Tema</button>
                 </div>
@@ -263,7 +265,6 @@ function renderMenu() {
     }
 }
 
-// Función para reasignar eventos dinámicos
 // Función para reasignar eventos dinámicos
 function attachDynamicEvents() {
     // Botones de logout
@@ -334,7 +335,6 @@ $(document).ready(function () {
     // Renderizar el menú dinámico
     renderMenu();
 });
-
 
 // Función para obtener el valor actual de userId desde las cookies
 function getUserId() {
