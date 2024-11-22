@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="../../dist/css/style.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>    
     <nav>
         <ul>
             <div class="left-group">
@@ -141,8 +141,10 @@ Revisa el HTML para asegurarte de que no hay espacios no deseados. Además, pued
             </div>
     </div>
     <div class="message-container">
-        <input type="text" placeholder="Escribe una idea..." class="message-input">
-        <button class="send-button">Enviar</button>
+        <input type="text" placeholder="Escribe una idea..." class="message-input" id="button-post">
+        <button class="send-button" onclick="sendMessage()">Enviar</button>
     </div>
+    <div id="response"></div>
+    <script src="../../dist/js/post.js"></script>
 </body>
 </html>
