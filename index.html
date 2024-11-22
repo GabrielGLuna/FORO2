@@ -54,10 +54,10 @@
 
         <div class="recommended-group">
 
-            <div class="recommended">
-                <img src="dist/img/chanelIMG.webp" alt="Logo canal recommended">
-                <p>CP RICOLINO HOLA PAPUS</p>
-            </div>
+            <!-- <div class="recommended">
+                <img src="dist/php/uploads/imagen.jpg" alt="Logo canal recommended"> // imagen desde uploads
+                <p>NombreCanal</p> // canalname
+            </div> -->
 
         </div>
         
@@ -65,16 +65,16 @@
             <h1>Mis canales</h1>
             <div class="container-channels">
 
-                <div class="card-channel">
+                <!-- <div class="card-channel">
 
-                        <img src="dist/img/chanelIMG2.jpg" alt="Logo canal card">
-                        <h5 class="channel-title">Niños y niñas 23</h5>
+                        <img src="dist/php/uploads/imagen.jpg" alt="Logo canal card"> // imagen desde uploads
+                        <h5 class="channel-title">NombreCanal</h5> // canalname
                         <div class="card-body">
-                            <p class="card-notifications"><i class='bx bxs-bell'></i> 62</p>
-                            <p class="card-actives">10 Activos <i class='bx bxs-circle'></i></p>
+                            <p class="card-category"><i class='bx bx-category-alt'></i> Category</p> // category
+                            <p class="card-actives">10 Miembros <i class='bx bxs-group'></i></p> // numintegrantes
                         </div>
 
-                </div>
+                </div> -->
 
 
             </div>
@@ -100,6 +100,30 @@
         </div>
         <div class="modal-overlay"></div>
     </div>
+    
+    <!-- Modal de Agregar Canales -->
+    <div class="modal-addChannel" id="modal-addChannel">
+        <div class="modal-content">
+            <span class="close-btn" id="close-modalCH">&times;</span>
+            <h2>Agregar canal</h2>
+            <form>
+                <label for="canalname">Nombre del canal:</label>
+                <input type="text" id="canalname" placeholder="Nombre de tu canal" required>
+                <label for="description">Describe tu canal:</label>
+                <textarea name="description-channel" id="description" placeholder="¿De qué trata tu canal?"></textarea>
+                <label for="numintegrantes">Número de integrantes:</label>
+                <input type="number" id="numintegrantes" placeholder="Integrantes de tu canal" required>
+                <label for="category">Categoría:</label>
+                <select name="category" id="category"></select>
+                <label for="image" class="file-label" id="file-label">Seleccionar foto</label>
+                <input type="file" id="image" accept="image/*" class="file-input">
+                <div class="cont-btn-addCH">
+                    <button class="btn-createChannel">Crear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modal de Login -->
     <div class="modal-login" id="modal-login">
         <div class="modal-content">

@@ -92,6 +92,20 @@ const userButtons = document.querySelectorAll('.btn-user');
 const openRegisterModal = document.getElementById('open-register-modal');
 const backToLogin = document.getElementById('back-to-login');
 
+const modalAddChannel = document.getElementById('modal-addChannel');
+const closeModalChannel = document.getElementById('close-modalCH');
+const addChannelButtons = document.querySelectorAll('.btn-addChannel');
+
+addChannelButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        modalAddChannel.style.display = 'flex';
+    });
+});
+
+closeModalChannel.addEventListener('click', () => {
+    modalAddChannel.style.display = 'none';
+});
+
 // Mostrar modal de login al hacer clic en cualquier botón de usuario
 userButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -128,6 +142,9 @@ window.addEventListener('click', (event) => {
     }
     if (event.target === modalRegister) {
         modalRegister.style.display = 'none';
+    }
+    if (event.target === modalAddChannel) {
+        modalAddChannel.style.display = 'none';
     }
 });
 
@@ -207,7 +224,7 @@ function renderMenu() {
             <li class="icon-search-responsive">
                 <button class="btn-search-responsive"><i class='bx bx-search'></i></button>
             </li>
-            <li class="menu-items"><button class="btn-addChanel"><i class='bx bx-plus-circle'></i></button></li>
+            <li class="menu-items"><button class="btn-addChannel"><i class='bx bx-plus-circle'></i></button></li>
             <li class="menu-items"><button class="toggle-theme"><i class='bx bx-sun'></i></button></li>
             <li class="menu-items"><button class="btn-account"><i class='bx bx-user-circle'></i></button></li>
             <li class="menu-items"><button class="btn-logout"><i class='bx bx-log-out'></i></button></li>
@@ -215,7 +232,7 @@ function renderMenu() {
                 <button><i class='bx bx-dots-vertical-rounded'></i></button>
                 <div class="dropdown-menu">
                     <button class="btn-account"><i class='bx bx-user-circle'></i> Cuenta</button>
-                    <button class="btn-account"><i class='bx bx-plus-circle'></i> Crear Canal</button>
+                    <button class="btn-addChannel"><i class='bx bx-plus-circle'></i> Crear Canal</button>
                     <button class="btn-logout"><i class='bx bx-log-out'></i> Logout</button>
                     <button class="toggle-theme"><i class='bx bx-sun'></i> Tema</button>
                 </div>
@@ -277,6 +294,14 @@ function attachDynamicEvents() {
         btn.addEventListener("click", () => {
             const modalLogin = document.getElementById("modal-login");
             modalLogin.style.display = "flex";
+        });
+    });
+
+    // Botones de usuario (Iniciar sesión o Cuenta)
+    document.querySelectorAll(".btn-addChannel").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const modalAddChannel = document.getElementById("modal-addChannel");
+            modalAddChannel.style.display = "flex";
         });
     });
 
@@ -474,4 +499,155 @@ $(document).ready(function () {
     userId = getCookie("iduser");
 });
 
+// Función para agregar un canal
+function addChannel(event) {
+    event.preventDefault();
 
+    const canalName = $("#canalname").val();
+    const description = $("#description").val();
+    const numIntegrantes = $("#numintegrantes").val();
+    const category = $("#category").val();
+    const image = $("#image")[0].files[0];
+
+    // Obtener userId desde las cookies
+    const idAdmin = getCookie("iduser");
+
+    if (!canalName || !numIntegrantes || !category || !idAdmin) {
+        showAlert("error", "Por favor, completa todos los campos obligatorios.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("action", "addChannel");
+    formData.append("canalname", canalName);
+    formData.append("description", description);
+    formData.append("numintegrantes", numIntegrantes);
+    formData.append("category", category);
+    formData.append("id_admin", idAdmin);
+    formData.append("image", image);
+
+    $.ajax({
+        url: 'http://localhost/FORO/dist/php/channels.php',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'ok') {
+                showAlert("success", "Canal creado exitosamente.");
+                setTimeout(() => location.reload(), 1500); // Recargar el DOM
+            } else {
+                showAlert("error", response.message);
+            }
+        },
+        error: function(error) {
+            showAlert("error", "Error en la solicitud.");
+            console.error(error);
+        }
+    });
+}
+
+// Manejo del botón para cerrar el modal de canales
+$("#close-modalCH").on("click", function () {
+    $("#modal-addChannel").hide();
+});
+
+// Inicialización de categorías al cargar el DOM
+$(document).ready(function () {
+    loadCategories();
+
+    // Asignar evento al botón de creación de canal
+    $(".btn-createChannel").on("click", addChannel);
+});
+
+// Función para cargar las categorías en el select desde la base de datos
+function loadCategories() {
+    $.ajax({
+        url: 'http://localhost/FORO/dist/php/channels.php?action=getCategories',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'ok') {
+                const categories = response.data;
+                const categorySelect = $("#category");
+                categories.forEach(category => {
+                    categorySelect.append(`<option value="${category}">${category}</option>`);
+                });
+            } else {
+                showAlert("error", "Error al cargar categorías.");
+            }
+        },
+        error: function(error) {
+            showAlert("error", "Error en la solicitud.");
+            console.error(error);
+        }
+    });
+}
+
+// Función para cargar y mostrar canales del usuario
+function loadUserChannels() {
+    const idAdmin = getCookie("iduser"); // Obtener userId desde cookies
+
+    if (!idAdmin) {
+        showAlert("error", "No se pudo obtener el ID del usuario.");
+        return;
+    }
+
+    $.ajax({
+        url: 'http://localhost/FORO/dist/php/channels.php',
+        type: 'POST',
+        data: {
+            action: 'getChannels',
+            id_admin: idAdmin
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'ok') {
+                const channels = response.data;
+                const recommendedGroup = $(".recommended-group");
+                const containerChannels = $(".container-channels");
+
+                // Limpiar contenido anterior
+                recommendedGroup.empty();
+                containerChannels.empty();
+
+                // Construir canales recomendados y propios
+                channels.forEach(channel => {
+                    // Crear elementos de canales recomendados
+                    const recommendedHTML = `
+                        <div class="recommended">
+                            <img src="dist/php/${channel.image}" alt="Logo canal recommended">
+                            <p>${channel.canalname}</p>
+                        </div>
+                    `;
+                    recommendedGroup.append(recommendedHTML);
+
+                    // Crear elementos de canales propios
+                    const cardChannelHTML = `
+                        <div class="card-channel">
+                            <img src="dist/php/${channel.image}" alt="Logo canal card">
+                            <h5 class="channel-title">${channel.canalname}</h5>
+                            <div class="card-body">
+                                <p class="card-category"><i class='bx bx-category-alt'></i> ${channel.category}</p>
+                                <p class="card-actives">${channel.numintegrantes} Miembros <i class='bx bxs-group'></i></p>
+                            </div>
+                        </div>
+                    `;
+                    containerChannels.append(cardChannelHTML);
+                });
+            } else {
+                showAlert("error", response.message);
+            }
+        },
+        error: function(error) {
+            showAlert("error", "Error en la solicitud.");
+            console.error(error);
+        }
+    });
+}
+
+// Inicialización al cargar el DOM
+$(document).ready(function () {
+    loadUserChannels(); // Cargar canales del usuario
+});

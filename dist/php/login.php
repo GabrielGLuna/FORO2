@@ -1,5 +1,5 @@
 <?php
-require "db.php"; // Asegúrate de que este archivo configure correctamente la conexión
+require "db.php";
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
