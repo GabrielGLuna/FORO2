@@ -163,6 +163,13 @@ fileInput.addEventListener('change', () => {
     }
 });
 
+document.getElementById('imageChannel').addEventListener('change', function() {
+    var label = document.getElementById('file-labelChannel');
+    label.style.backgroundColor = '#198754';
+    label.style.color = 'white';
+    label.innerHTML += '<span style="margin-left: 5px;">(Seleccionado)</span>';
+  });  
+
 // Variable global para el ID del usuario
 let userId = null;
 
@@ -507,7 +514,7 @@ function addChannel(event) {
     const description = $("#description").val();
     const numIntegrantes = $("#numintegrantes").val();
     const category = $("#category").val();
-    const image = $("#image")[0].files[0];
+    const image = $("#imageChannel")[0].files[0];
 
     // Obtener userId desde las cookies
     const idAdmin = getCookie("iduser");
@@ -585,21 +592,12 @@ function loadCategories() {
     });
 }
 
-// Función para cargar y mostrar canales del usuario
 function loadUserChannels() {
-    const idAdmin = getCookie("iduser"); // Obtener userId desde cookies
-
-    if (!idAdmin) {
-        showAlert("error", "No se pudo obtener el ID del usuario.");
-        return;
-    }
-
     $.ajax({
         url: 'http://localhost/FORO/dist/php/channels.php',
         type: 'POST',
         data: {
-            action: 'getChannels',
-            id_admin: idAdmin
+            action: 'getChannels' // Eliminar id_admin de aquí
         },
         dataType: 'json',
         success: function(response) {
