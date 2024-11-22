@@ -1,0 +1,53 @@
+Ahora, tambien tengo esto:
+
+    <!-- Contenido -->
+    <div class="content-body">
+
+        <div class="recommended-group">
+
+            <div class="recommended">
+                <img src="dist/php/uploads/imagen.jpg" alt="Logo canal recommended"> // imagen desde uploads
+                <p>NombreCanal</p> // canalname
+            </div>
+
+        </div>
+        
+        <div class="channels">
+            <h1>Mis canales</h1>
+            <div class="container-channels">
+
+                <div class="card-channel">
+
+                        <img src="dist/php/uploads/imagen.jpg" alt="Logo canal card"> // imagen desde uploads
+                        <h5 class="channel-title">NombreCanal</h5> // canalname
+                        <div class="card-body">
+                            <p class="card-category"><i class='bx bx-category-alt'></i> Category</p> // category
+                            <p class="card-actives">10 Miembros <i class='bx bxs-group'></i></p> // numintegrantes
+                        </div>
+
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+
+    vamos a crear dinamicamente cada recommended y card-channel con su respectivo canal desde el js, si necesitas modificar el php, hazlo.
+
+    mi html se vera así:
+    <div class="content-body">
+
+        <div class="recommended-group">
+            <!-- Todos los recommended -->
+        </div>
+
+        <div class="container-channels">
+            <!-- Todos los card-channel -->
+        </div>
+
+    </div>
+
+    Todo se construira desde el js traído desde el php
+
+

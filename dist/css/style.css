@@ -10,6 +10,7 @@
     --border-color: #b7b7b7;
     --success-bt: #198754;
     --danger-bt: #dc3545;
+    --color-white: #fff;
 }
 
 /* Tema oscuro */
@@ -198,6 +199,13 @@ nav ul .spacer {
 .dropdown-menu,
 .menu-toggle:focus-within .dropdown-menu {
     display: block;
+}
+
+.section-feed-active{
+    padding: 5px;
+    background: var(--primary-blue-bt) !important;
+    color: var(--color-white) !important;
+    cursor: auto;
 }
 
 /* Responsividad */
@@ -648,7 +656,7 @@ nav ul .spacer {
 }
 
 .card-actives{
-    font-size: clamp(10px, 2vw, 15px);
+    font-size: clamp(8px, 2vw, 12px);
     display: flex;
     align-items: center;
     gap: .2rem;
@@ -658,12 +666,12 @@ nav ul .spacer {
     color: var(--success-bt);
 }
 
-.card-notifications {
-    font-size: clamp(10px, 2vw, 15px);
+.card-category {
+    font-size: clamp(8px, 2vw, 12px);
     display: flex;
     align-items: center;
     gap: .2rem;
-    color: var(--danger-bt);
+    color: var(--primary-blue-bt);
     font-weight: 700;
 }
 
@@ -787,3 +795,224 @@ nav ul .spacer {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }
+
+.modal-addChannel {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--nav-background);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-addChannel .modal-content {
+    background: var(--background-color);
+    color: var(--text-color);
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-addChannel .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 18px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #333;
+}
+
+.modal-addChannel h2 {
+    margin-bottom: 20px;
+}
+
+.modal-addChannel label {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.modal-addChannel input, textarea, select{
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    color: var(--text-color);
+    background: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.modal-addChannel .btn-createChannel {
+    background: var(--primary-blue-bt);
+    color: var(--color-white);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.modal-addChannel .btn-createChannel:hover {
+    background: #0056b3;
+}
+
+.modal-addChannel .form-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.modal-addChannel .form-buttons .btn-createChannel {
+    flex: 0 0 48%;
+}
+
+.cont-btn-addCH{
+    display: flex;
+    justify-content: end;
+}
+
+/* General styles for modal-login */
+.modal-login {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--nav-background);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-login .modal-content {
+    background: var(--background-color);
+    color: var(--text-color);
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-login .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 18px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #333;
+}
+
+.modal-login h2 {
+    margin-bottom: 20px;
+}
+
+.modal-login label {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.modal-login input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    color: var(--text-color);
+    background: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.modal-login .btn-login {
+    background: var(--primary-blue-bt);
+    color: var(--color-white);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.modal-login .btn-login:hover {
+    background: #0056b3;
+}
+
+/* Estilos generales de los modales se mantienen iguales */
+
+.btn-register {
+    background: none;
+    color: var(--primary-blue-bt);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.modal-login .form-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.modal-login .form-buttons .btn-login {
+    flex: 0 0 48%;
+}
+
+.cont-btn-log{
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Estilo del label que actúa como botón */
+.file-label {
+    display: flex;
+    justify-content: center;
+    background: var(--primary-blue-bt);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.file-label:hover {
+    background: #0056b3;
+}
+
+/* Ocultar el input real */
+.file-input {
+    display: none;
+}
+
+/* Cambiar estilo del label cuando se selecciona un archivo */
+.file-label.selected {
+    display: flex;
+    justify-content: center;
+    background: var(--success-bt);
+    color: var(--color-white);
+}
+
