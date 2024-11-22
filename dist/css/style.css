@@ -1110,3 +1110,35 @@ button#submit-comment:hover {
     color: var(--color-white);
 }
 
+.file-labelChannel {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .file-inputChannel {
+    display: none;
+  }
+  
+  .file-inputChannel::file-selector-button {
+    display: none;
+  }
+  
+  .file-inputChannel:focus + .file-labelChannel {
+    outline: none;
+  }
+  
+  .file-inputChannel:not(:placeholder-shown) + .file-labelChannel {
+    background-color: var(--success-bt);
+    color: var(--color-white);
+    font-weight: bold;
+  }
+  
+  .file-inputChannel:not(:placeholder-shown) + .file-labelChannel::after {
+    content: "Imagen Lista";
+  }
+  

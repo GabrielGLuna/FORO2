@@ -66,18 +66,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
         $connection->close();
     } elseif ($action === 'getChannels') {
-        // Obtener todos los canales del usuario
-        $idAdmin = $_POST['id_admin'];
-
-        if (empty($idAdmin)) {
-            jsonResponse('error', 'Usuario no válido.');
-        }
-
-        $stmt = $connection->prepare("SELECT canalname, description, numintegrantes, image, category FROM canales WHERE id_admin = ?");
-        $stmt->bind_param("i", $idAdmin);
+        // Obtener todos los canales, sin filtrar por id_admin
+        $stmt = $connection->prepare("SELECT canalname, description, numintegrantes, image, category FROM canales");
         $stmt->execute();
         $result = $stmt->get_result();
-
+    
         if ($result->num_rows > 0) {
             $channels = [];
             while ($row = $result->fetch_assoc()) {
@@ -87,10 +80,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             jsonResponse('error', 'No se encontraron canales.');
         }
-
+    
         $stmt->close();
         $connection->close();
-    } else {
+    }
+     else {
         jsonResponse('error', 'Acción no permitida.');
     }
 } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'getCategories') {
