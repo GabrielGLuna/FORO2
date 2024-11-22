@@ -6,8 +6,8 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Función para enviar una respuesta JSON
-function jsonResponse($status, $answer) {
-    echo json_encode(['status' => $status, 'answer' => $answer]);
+function jsonResponse($status, $answer, $iduser = null) {
+    echo json_encode(['status' => $status, 'answer' => $answer, 'iduser' => $iduser]);
     exit;
 }
 
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Verificar contraseña
             if (password_verify($password, $hashedPassword)) {
-                jsonResponse('ok', 'Inicio de sesión exitoso.');
+                jsonResponse('ok', 'Inicio de sesión exitoso.', $iduser); // Incluir el iduser
             } else {
                 jsonResponse('error', 'Contraseña incorrecta.');
             }
@@ -121,7 +121,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("ssssiss", $username, $hashedPassword, $email, $phone, $age, $imagePath, $canales);
 
         if ($stmt->execute()) {
-            jsonResponse('ok', 'Registro exitoso.');
+            $iduser = $stmt->insert_id; // Obtener el ID insertado
+            jsonResponse('ok', 'Registro exitoso.', $iduser); // Incluir el iduser
         } else {
             jsonResponse('error', 'Error al registrar: ' . $stmt->error);
         }

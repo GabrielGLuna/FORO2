@@ -1,5 +1,3 @@
-let userID;
-
 // Selección de elementos
 const themeToggleButtons = document.querySelectorAll('.toggle-theme');
 const body = document.body;
@@ -148,105 +146,324 @@ fileInput.addEventListener('change', () => {
     }
 });
 
-    // Función para iniciar sesión
-    function logUser(event) {
-        event.preventDefault();
+// Variable global para el ID del usuario
+let userId = null;
 
-        var email = $("#email").val();
-        var password = $("#password").val();
+// Función para establecer cookies
+function setCookie(name, value, days) {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
+}
 
-        // Validar campos
-        if (!email || !password) {
-            alert("Por favor, completa todos los campos.");
-            return;
+// Función para obtener cookies
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+// Función para eliminar cookies
+function deleteCookie(name) {
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+}
+
+// Función para renderizar el menú dinámico
+function renderMenu() {
+    const leftGroup = document.querySelector(".left-group");
+    const rightGroup = document.querySelector(".right-group");
+
+    // Verificar si userId está presente
+    if (userId) {
+        // Comprobar si "Para ti / Siguiendo" ya existe
+        if (!document.querySelector(".btns-content")) {
+            const btnsContent = document.createElement("li");
+            btnsContent.className = "btns-content";
+            btnsContent.innerHTML = `
+                <button>Para ti</button>
+                <button class="section-feed-active">Siguiendo</button>
+            `;
+            leftGroup.insertAdjacentElement("afterend", btnsContent);
         }
 
-        $.ajax({
-            url: 'http://localhost/FORO/dist/php/login.php',
-            type: 'POST',
-            data: {
-                action: 'login',
-                email: email,
-                password: password
-            },
-            dataType: 'json',
-            success: function(response) {
-                if (response.status === 'ok') {
-                    alert('Inicio de sesión exitoso.');
-                } else {
-                    alert('Error: ' + response.answer);
-                }
-            },
-            error: function(error) {
-                alert('Error en la solicitud.');
-                console.error(error);
-            }
+        // Reemplazar solo los botones de usuario dinámicos
+        rightGroup.innerHTML = `
+            <li class="search-container">
+                <button class="btn-search">
+                    <div class="btn-srch-right">
+                        <i class='bx bx-search'></i> Buscar
+                    </div>
+                    <div class="btn-srch-left">
+                        <div class="wnd">
+                            <i class='bx bxl-windows'></i>
+                        </div>
+                        <div class="wnd">
+                            <p>C</p>
+                        </div>
+                    </div>
+                </button>
+            </li>
+            <li class="icon-search-responsive">
+                <button class="btn-search-responsive"><i class='bx bx-search'></i></button>
+            </li>
+            <li class="menu-items"><button class="toggle-theme"><i class='bx bx-sun'></i></button></li>
+            <li class="menu-items"><button class="btn-account"><i class='bx bx-user-circle'></i></button></li>
+            <li class="menu-items"><button class="btn-logout"><i class='bx bx-log-out'></i></button></li>
+            <li class="menu-toggle">
+                <button><i class='bx bx-dots-vertical-rounded'></i></button>
+                <div class="dropdown-menu">
+                    <button class="btn-account"><i class='bx bx-user-circle'></i> Cuenta</button>
+                    <button class="btn-logout"><i class='bx bx-log-out'></i> Logout</button>
+                    <button class="toggle-theme"><i class='bx bx-sun'></i> Tema</button>
+                </div>
+            </li>
+        `;
+
+        // Reasignar eventos
+        attachDynamicEvents();
+    } else {
+        // Sin userId: Quitar "Para ti / Siguiendo"
+        const btnsContent = document.querySelector(".btns-content");
+        if (btnsContent) btnsContent.remove();
+
+        // Restaurar los botones predeterminados
+        rightGroup.innerHTML = `
+            <li class="search-container">
+                <button class="btn-search">
+                    <div class="btn-srch-right">
+                        <i class='bx bx-search'></i> Buscar
+                    </div>
+                    <div class="btn-srch-left">
+                        <div class="wnd">
+                            <i class='bx bxl-windows'></i>
+                        </div>
+                        <div class="wnd">
+                            <p>C</p>
+                        </div>
+                    </div>
+                </button>
+            </li>
+            <li class="icon-search-responsive">
+                <button class="btn-search-responsive"><i class='bx bx-search'></i></button>
+            </li>
+            <li class="menu-items"><button class="toggle-theme"><i class='bx bx-sun'></i></button></li>
+            <li class="menu-items"><button class="btn-user"><i class='bx bx-user'></i></button></li>
+            <li class="menu-toggle">
+                <button><i class='bx bx-dots-vertical-rounded'></i></button>
+                <div class="dropdown-menu">
+                    <button class="btn-user"><i class='bx bx-user'></i> Iniciar Sesión</button>
+                    <button class="toggle-theme"><i class='bx bx-sun'></i> Tema</button>
+                </div>
+            </li>
+        `;
+
+        // Reasignar eventos
+        attachDynamicEvents();
+    }
+}
+
+// Función para reasignar eventos dinámicos
+// Función para reasignar eventos dinámicos
+function attachDynamicEvents() {
+    // Botones de logout
+    document.querySelectorAll(".btn-logout").forEach(btn => {
+        btn.addEventListener("click", handleLogout);
+    });
+
+    // Botones de tema
+    const themeToggleButtons = document.querySelectorAll('.toggle-theme');
+    themeToggleButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const newTheme = body.classList.contains('dark') ? 'light' : 'dark';
+            setTheme(newTheme);
         });
+    });
+
+    // Reasignar eventos de los botones de búsqueda
+    const btnSearch = document.querySelector('.btn-search');
+    const btnSearchResponsive = document.querySelector('.btn-search-responsive');
+
+    if (btnSearch) {
+        btnSearch.addEventListener('click', openModal);
     }
 
-    // Función para registrar usuario
-    function registerUser(event) {
-        event.preventDefault();
+    if (btnSearchResponsive) {
+        btnSearchResponsive.addEventListener('click', openModal);
+    }
+}
 
-        var username = $("#username").val();
-        var email = $("#email-register").val();
-        var password = $("#password-register").val();
-        var phone = $("#phone").val();
-        var age = $("#age").val();
-        var image = $("#image")[0].files[0];
+// Función para inicializar la aplicación
+function initializeApp() {
+    // Inicializar userId desde las cookies
+    userId = getCookie("iduser");
 
-        // Validar campos
-        if (!username || !email || !password || !phone || !age) {
-            alert("Por favor, completa todos los campos.");
-            return;
+    // Renderizar el menú dinámico
+    renderMenu();
+
+    // Asignar eventos iniciales
+    attachDynamicEvents();
+}
+
+// Inicialización al cargar el DOM
+$(document).ready(function () {
+    initializeApp();
+});
+
+
+// Función para manejar el logout
+function handleLogout() {
+    deleteCookie("iduser");
+    userId = null;
+    renderMenu(); // Reconstruir el menú
+}
+
+// Inicialización al cargar el DOM
+$(document).ready(function () {
+    // Inicializar userId desde las cookies
+    userId = getCookie("iduser");
+
+    // Renderizar el menú dinámico
+    renderMenu();
+});
+
+
+// Función para obtener el valor actual de userId desde las cookies
+function getUserId() {
+    return getCookie("iduser");
+}
+
+// Ejemplo de uso
+$(document).ready(function () {
+    console.log("userId desde función:", getUserId());
+});
+
+// Función para mostrar mensajes con SweetAlert
+function showAlert(type, message) {
+    Swal.fire({
+        icon: type,
+        title: message,
+        showConfirmButton: false,
+        timer: 1500
+    });
+}
+
+// Función para iniciar sesión
+function logUser(event) {
+    event.preventDefault();
+
+    const email = $("#email").val();
+    const password = $("#password").val();
+
+    if (!email || !password) {
+        showAlert("error", "Por favor, completa todos los campos.");
+        return;
+    }
+
+    $.ajax({
+        url: 'http://localhost/FORO/dist/php/login.php',
+        type: 'POST',
+        data: {
+            action: 'login',
+            email: email,
+            password: password
+        },
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'ok') {
+                // Guardar iduser en cookies
+                setCookie("iduser", response.iduser, 7);
+                // Actualizar variable global
+                userId = response.iduser;
+
+                showAlert("success", "Inicio de sesión exitoso.");
+                setTimeout(() => location.reload(), 1500); // Recargar el DOM
+            } else {
+                showAlert("error", response.answer);
+            }
+        },
+        error: function(error) {
+            showAlert("error", "Error en la solicitud.");
+            console.error(error);
         }
+    });
+}
 
-        var formData = new FormData();
-        formData.append("action", "register");
-        formData.append("username", username);
-        formData.append("email", email);
-        formData.append("password", password);
-        formData.append("phone", phone);
-        formData.append("age", age);
-        formData.append("image", image);
+// Función para registrar usuario
+function registerUser(event) {
+    event.preventDefault();
 
-        $.ajax({
-            url: 'http://localhost/FORO/dist/php/login.php',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function(response) {
-                if (response.status === 'ok') {
-                    alert('Registro exitoso.');
-                } else {
-                    alert('Error: ' + response.answer);
-                }
-            },
-            error: function(error) {
-                alert('Error en la solicitud.');
-                console.error(error);
-            }
-        });
+    const username = $("#username").val();
+    const email = $("#email-register").val();
+    const password = $("#password-register").val();
+    const phone = $("#phone").val();
+    const age = $("#age").val();
+    const image = $("#image")[0].files[0];
+
+    if (!username || !email || !password || !phone || !age) {
+        showAlert("error", "Por favor, completa todos los campos.");
+        return;
     }
 
-    // Manejo de los botones para cambiar entre modales
-    $("#open-register-modal").on("click", function () {
-        $("#modal-login").hide();
-        $("#modal-register").show();
-    });
+    const formData = new FormData();
+    formData.append("action", "register");
+    formData.append("username", username);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("phone", phone);
+    formData.append("age", age);
+    formData.append("image", image);
 
-    $("#back-to-login").on("click", function () {
-        $("#modal-register").hide();
-        $("#modal-login").show();
-    });
+    $.ajax({
+        url: 'http://localhost/FORO/dist/php/login.php',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'ok') {
+                // Guardar iduser en cookies
+                setCookie("iduser", response.iduser, 7);
+                // Actualizar variable global
+                userId = response.iduser;
 
-    // Botones de cerrar modal
-    $("#close-modal").on("click", function () {
-        $("#modal-login").hide();
+                showAlert("success", "Registro exitoso.");
+                setTimeout(() => location.reload(), 1500); // Recargar el DOM
+            } else {
+                showAlert("error", response.answer);
+            }
+        },
+        error: function(error) {
+            showAlert("error", "Error en la solicitud.");
+            console.error(error);
+        }
     });
+}
 
-    $("#close-register").on("click", function () {
-        $("#modal-register").hide();
-    });
+// Manejo de los botones para cambiar entre modales
+$("#open-register-modal").on("click", function () {
+    $("#modal-login").hide();
+    $("#modal-register").show();
+});
+
+$("#back-to-login").on("click", function () {
+    $("#modal-register").hide();
+    $("#modal-login").show();
+});
+
+// Botones de cerrar modal
+$("#close-modal").on("click", function () {
+    $("#modal-login").hide();
+});
+
+$("#close-register").on("click", function () {
+    $("#modal-register").hide();
+});
+
+// Inicialización de la variable global desde las cookies al cargar el DOM
+$(document).ready(function () {
+    userId = getCookie("iduser");
+});
+
+
