@@ -98,7 +98,7 @@
                     </button>                    
                 </ul>                
             </div>
-            <div class="post">
+            <!--<div class="post">
                 <div class="head-post">
                     <img src="../../dist/img/image.png" alt="User Photo">
                     <div class="info">
@@ -124,6 +124,9 @@ Revisa el HTML para asegurarte de que no hay espacios no deseados. Además, pued
                         <i class='bx bx-share-alt'></i> Compartir
                     </button>
                 </div>
+            </div>-->
+            <div id="posts-container" >
+
             </div>
             <div class="right-side">
                 <div class="popular-channels">
@@ -144,7 +147,27 @@ Revisa el HTML para asegurarte de que no hay espacios no deseados. Además, pued
         <input type="text" placeholder="Escribe una idea..." class="message-input" id="button-post">
         <button class="send-button" onclick="sendMessage()">Enviar</button>
     </div>
-    <div id="response"></div>
+    <div id="response"></div>    
+    <!-- Contenedor de la ventana emergente -->
+    <div id="comment-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Comentarios</h2>
+            <div class="comments-section">
+                <div class="existing-comments">
+                    <!-- Aquí se mostrarán comentarios existentes -->
+                    <p>No hay comentarios aún. ¡Sé el primero en comentar!</p>
+                </div>
+                <div class="add-comment">
+                    <textarea placeholder="Escribe tu comentario aquí..." id="comment-input"></textarea>
+                    <button id="submit-comment">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button onclick="document.getElementById('comment-modal').style.display = 'block'">Mostrar Modal</button>
+
     <script src="../../dist/js/post.js"></script>
 </body>
+
 </html>
