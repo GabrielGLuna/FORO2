@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt->close();
     }
-
+    
     $connection->close();
 } else {
     jsonResponse('error', 'Método no permitido.');
