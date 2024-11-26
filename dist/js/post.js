@@ -226,6 +226,7 @@ function sendMessage() {
 }
 
 window.onload = function () {
+    console.log("solo para ver los cambios jaja");
     loadSidebarChannels(); // Cargar canales en la barra lateral
     loadPosts(); // Cargar posts del canal seleccionado (si existe cookie)
 };
