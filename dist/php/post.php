@@ -217,6 +217,7 @@ if (isset($_POST['message'])) {
                 $stmt->close();
     }
 } elseif ($action === 'loadChanels') {
+    
     if (!empty($idUser)) {
         $sql1 = "SELECT canales FROM usuario WHERE iduser = ?";
         $stmt1 = $connection->prepare($sql1);
@@ -244,7 +245,6 @@ if (isset($_POST['message'])) {
         $stmt1->close();
     }
 }
-
 
 $connection->close();  // Cerrar la conexión a la base de datos
 ?>

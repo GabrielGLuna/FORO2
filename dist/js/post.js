@@ -147,13 +147,14 @@ function loadPosts() {
 }
 
 function loadSidebarChannels() {
+    idUser = getCookie("iduser");
     $.ajax({
-        url: "http://localhost/FORO2/dist/php/sideBarChannels.php",
+        url: "http://localhost/FORO2/dist/php/post.php",
         type: "POST",
-        data: { action: "getChannels" },
+        data: { action: "loadChanels" , idUser: idUser},
         dataType: "json",
         success: function (response) {
-            if (response.status === "ok") {
+            if (response.success) {
                 const channels = response.data;
                 const groupButton = $(".group-button");
 
@@ -161,7 +162,7 @@ function loadSidebarChannels() {
                 groupButton.empty();
 
                 // Crear botones dinámicos para cada canal
-                channels.forEach(channel => {                    
+                response.list.forEach(channel => {                    
 
                     const channelButton = `
                         <button class="button-chanel" data-id="${channel.id_canal}">
@@ -207,6 +208,39 @@ function loadSidebarChannels() {
             console.error("Error en la solicitud:", error);
             alert("Error al cargar los canales.");
         }
+    });
+}
+function loadSidebarChannels2() {
+
+    idUser = getCookie("iduser");
+    console.log("entro en load js", idUser);
+    $.ajax({
+        url: 'http://localhost/FORO2/dist/php/post.php',
+                type: 'POST',
+                data: { action: 'loadChanels', idUser: idUser},
+                dataType: 'json',
+                success: function(response){
+                    console.log("canales: ", response);
+                    if (response.success) {      
+                        response.list.forEach(canal => {
+                            
+                            console.log("canales: ", canal.canalname);
+                                // Crear el formato HTML para cada post
+                                var postHTML = `
+                        <button class="button-chanel" data-id="${channel.id_canal}">
+                            <img src="dist/php/${channel.image}" class="mini-image" alt="${channel.canalname}">
+                            <p>${channel.canalname}</p>
+                        </button>
+                    
+                                `;
+                                // Agregar el nuevo post al contenedor
+                                document.getElementById('.group-button').innerHTML += postHTML;
+                            });                        
+                    }
+                },
+                error: function(xhr) {
+                    console.error("Error en la solicitud:", xhr.responseText);
+                }
     });
 }
 
