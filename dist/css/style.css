@@ -320,8 +320,9 @@ nav ul .spacer {
     margin-top: 5rem;
 }
 
+
 /* Fondo de la ventana emergente */
-.modal {
+.modal-comment {
     display: block; /* Oculto por defecto */
     position: fixed;
     z-index: 1000;
