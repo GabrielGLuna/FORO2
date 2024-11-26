@@ -53,25 +53,40 @@ submitComment.addEventListener('click', () => {
 
 
 function loadPosts() {
+    // Leer el id_canal de la cookie
+    const cookies = document.cookie.split(";").reduce((acc, cookie) => {
+        const [key, value] = cookie.trim().split("=");
+        acc[key] = value;
+        return acc;
+    }, {});
+    const id_canal = cookies.id_canal;
+
+    if (!id_canal) {
+        alert("Por favor, selecciona un canal primero.");
+        return;
+    }
+
     // Crear una solicitud AJAX
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "http://localhost/FORO/dist/php/get_posts.php", true);
-    
-    // Cuando la solicitud se haya completado con éxito
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            console.log(xhr.responseText);  // Imprime la respuesta del servidor
-            try {
-                var response = JSON.parse(xhr.responseText); // Parsear el JSON devuelto
-                var posts = response.data; // Parsear el JSON devuelto
-                // Si hay posts
+    $.ajax({
+        url: "http://localhost/FORO2/dist/php/get_posts.php",
+        type: "POST",
+        data: { id_canal: id_canal },
+        dataType: "json",
+        success: function (response) {
+            if (response.status === "ok") {
+                const posts = response.data;
+                const postsContainer = $("#posts-container");
+
+                // Limpiar los posts anteriores
+                postsContainer.empty();
+
                 if (posts.length > 0) {
+                    // Construir los posts dinámicamente
                     posts.forEach(post => {
-                        // Crear el formato HTML para cada post
-                        var postHTML = `
+                        const postHTML = `
                             <div class="post">
                                 <div class="head-post">
-                                    <img src="../../dist/img/image.png" alt="User Photo">
+                                    <img src="dist/img/image.png" alt="User Photo">
                                     <div class="info">
                                         <span class="name">Krlos</span>
                                         <span class="time">${post.fecha}</span>
@@ -82,35 +97,95 @@ function loadPosts() {
                                 </div>
                                 <div class="interaction-post">
                                     <button>
-                                        <i class='bx bx-like'></i>Like
+                                        ${40}<i class='bx bx-like'></i>
                                     </button>
                                     <button class='comment-button'>
-                                        <i class='bx bx-comment-detail'></i>Comentar
+                                        <i class='bx bx-comment-detail'></i>
                                     </button>
                                     <button>
-                                        <i class='bx bx-share-alt'></i> Compartir
+                                        <i class='bx bx-share-alt'></i>
                                     </button>
                                 </div>
                             </div>
                         `;
-                        // Agregar el nuevo post al contenedor
-                        document.getElementById('posts-container').innerHTML += postHTML;
+                        postsContainer.append(postHTML);
                     });
                 } else {
-                    document.getElementById('posts-container').innerHTML = "No hay posts disponibles.";
+                    postsContainer.html("No hay posts disponibles.");
                 }
-            } catch (e) {
-                alert("Hubo un error al procesar los datos: " + e.message);
+            } else {
+                alert("Error al cargar posts: " + response.message);
             }
-        } else {
-            alert("Hubo un error al cargar los posts.");
+        },
+        error: function (error) {
+            console.error("Error en la solicitud:", error);
+            alert("Error al cargar los posts.");
         }
-    };
-    
-
-    xhr.send(); // Enviar la solicitud
+    });
 }
 
+function loadSidebarChannels() {
+    $.ajax({
+        url: "http://localhost/FORO2/dist/php/sideBarChannels.php",
+        type: "POST",
+        data: { action: "getChannels" },
+        dataType: "json",
+        success: function (response) {
+            if (response.status === "ok") {
+                const channels = response.data;
+                const groupButton = $(".group-button");
+
+                // Limpiar contenido anterior
+                groupButton.empty();
+
+                // Crear botones dinámicos para cada canal
+                channels.forEach(channel => {
+                    const channelButton = `
+                        <button class="button-chanel" data-id="${channel.id_canal}">
+                            <img src="dist/php/${channel.image}" class="mini-image" alt="${channel.canalname}">
+                            <p>${channel.canalname}</p>
+                        </button>
+                    `;
+                    groupButton.append(channelButton);
+                });
+
+                // Agregar evento a cada botón
+                $(".button-chanel").on("click", function () {
+                    const id_canal = $(this).data("id");
+
+                    // Guardar el id_canal en una cookie
+                    document.cookie = `id_canal=${id_canal}; path=/`;
+
+                    // Indicar visualmente qué canal está abierto
+                    $(".button-chanel").removeClass("channel-open"); // Quitar la clase de todos los botones
+                    $(this).addClass("channel-open"); // Agregar la clase al botón actual
+
+                    // Cargar los posts correspondientes
+                    loadPosts();
+                });
+
+                // Resaltar el canal abierto basado en la cookie
+                const cookies = document.cookie.split(";").reduce((acc, cookie) => {
+                    const [key, value] = cookie.trim().split("=");
+                    acc[key] = value;
+                    return acc;
+                }, {});
+                const id_canal_cookie = cookies.id_canal;
+
+                if (id_canal_cookie) {
+                    // Resaltar el botón correspondiente
+                    $(`.button-chanel[data-id="${id_canal_cookie}"]`).addClass("channel-open");
+                }
+            } else {
+                alert("Error al cargar canales: " + response.message);
+            }
+        },
+        error: function (error) {
+            console.error("Error en la solicitud:", error);
+            alert("Error al cargar los canales.");
+        }
+    });
+}
 
 function sendMessage() {
     // Obtener el mensaje del input
@@ -135,7 +210,7 @@ function sendMessage() {
 
     // Usar AJAX para enviar los datos al servidor
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost/FORO/dist/php/post.php", true); // URL del archivo PHP
+    xhr.open("POST", "http://localhost/FORO2/dist/php/post.php", true); // URL del archivo PHP
     xhr.onload = function() {
         if (xhr.status === 200) {
             // Mostrar una respuesta del servidor
@@ -149,4 +224,9 @@ function sendMessage() {
     };
     xhr.send(formData); // Enviar los datos al servidor
 }
+
+window.onload = function () {
+    loadSidebarChannels(); // Cargar canales en la barra lateral
+    loadPosts(); // Cargar posts del canal seleccionado (si existe cookie)
+};
 

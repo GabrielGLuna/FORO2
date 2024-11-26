@@ -1,66 +1,21 @@
 // Selección de elementos
-const themeToggleButtons = document.querySelectorAll('.toggle-theme');
-const body = document.body;
-
-// Cargar el tema desde localStorage o usar el tema por defecto
-const currentTheme = localStorage.getItem('theme') || 'light';
-setTheme(currentTheme);
-
-// Función para alternar el tema
-function setTheme(theme) {
-    if (theme === 'dark') {
-        body.classList.add('dark');
-        updateIcons('dark');
-    } else {
-        body.classList.remove('dark');
-        updateIcons('light');
-    }
-    localStorage.setItem('theme', theme);
-}
-
-// Función para actualizar íconos de los botones de tema
-function updateIcons(theme) {
-    themeToggleButtons.forEach(button => {
-        const icon = button.querySelector('i');
-        if (theme === 'dark') {
-            icon.classList.remove('bx-sun');
-            icon.classList.add('bx-moon');
-        } else {
-            icon.classList.remove('bx-moon');
-            icon.classList.add('bx-sun');
-        }
-    });
-}
-
-// Añadir eventos a los botones
-themeToggleButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const newTheme = body.classList.contains('dark') ? 'light' : 'dark';
-        setTheme(newTheme);
-    });
-});
-
-// Selección de elementos
-const modal = document.getElementById('modal-search');
+const modalSearch = document.getElementById('modal-search');
 const modalOverlay = document.querySelector('.modal-overlay');
 const closeModalButton = document.querySelector('.close-modal');
 const btnSearch = document.querySelector('.btn-search');
 const btnSearchResponsive = document.querySelector('.btn-search-responsive');
-const searchInput = document.querySelector('.search-input');
-
+const searchInput = document.querySelector('.search-input'); // Selección del input
 
 // Función para abrir el modal
 const openModal = () => {
-    modal.classList.add('active');
-    setTimeout(() => searchInput.focus(), 50);
+    modalSearch.classList.add('active');
+    setTimeout(() => searchInput.focus(), 50); // Garantiza que el input sea enfocado tras mostrar el modal
 };
-
 
 // Función para cerrar el modal
 const closeModal = () => {
-    modal.classList.remove('active');
+    modalSearch.classList.remove('active');
 };
-
 
 // Listeners para abrir el modal
 btnSearch.addEventListener('click', openModal);
@@ -89,7 +44,7 @@ document.addEventListener('keydown', (event) => {
 // Selección de elementos
 const modalLogin = document.getElementById('modal-login');
 const modalRegister = document.getElementById('modal-register');
-const closeModalLogin = document.getElementById('close-modal');
+const closeModalLogin = document.getElementById('close-modalLog');
 const closeModalRegister = document.getElementById('close-register');
 const userButtons = document.querySelectorAll('.btn-user');
 const openRegisterModal = document.getElementById('open-register-modal');
@@ -222,12 +177,20 @@ function renderMenu() {
         // Reemplazar solo los botones de usuario dinámicos
         rightGroup.innerHTML = `
             <li class="search-container">
-    <button id="btn-open-search-modal" class="btn-search search">
-        <div class="btn-srch-right">
-            <i class='bx bx-search'></i> Buscar
-        </div>
-    </button>
-</li>
+                    <button class="btn-search">
+                        <div class="btn-srch-right">
+                            <i class='bx bx-search'></i> Buscar
+                        </div>
+                        <div class="btn-srch-left">
+                            <div class="wnd">
+                                <i class='bx bxl-windows'></i>
+                            </div>
+                            <div class="wnd">
+                                <p>C</p>
+                            </div>
+                        </div>
+                    </button>
+                </li>
 
             <li class="icon-search-responsive">
                 <button class="btn-search-responsive"><i class='bx bx-search'></i></button>
@@ -289,6 +252,14 @@ function renderMenu() {
         attachDynamicEvents();
     }
 }
+
+document.getElementById('imageChannel').addEventListener('change', function() {
+    var label = document.getElementById('file-labelChannel');
+    label.style.backgroundColor = '#4CAF50';
+    label.style.color = 'white';
+    label.innerHTML += '<span style="margin-left: 5px;">(Seleccionado)</span>';
+  });
+  
 
 // Función para reasignar eventos dinámicos
 function attachDynamicEvents() {
@@ -409,7 +380,7 @@ function logUser(event) {
     }
 
     $.ajax({
-        url: 'http://localhost/FORO/dist/php/login.php',
+        url: 'http://localhost/FORO2/dist/php/login.php',
         type: 'POST',
         data: {
             action: 'login',
@@ -463,7 +434,7 @@ function registerUser(event) {
     formData.append("image", image);
 
     $.ajax({
-        url: 'http://localhost/FORO/dist/php/login.php',
+        url: 'http://localhost/FORO2/dist/php/login.php',
         type: 'POST',
         data: formData,
         processData: false,
@@ -542,7 +513,7 @@ function addChannel(event) {
     formData.append("image", image);
 
     $.ajax({
-        url: 'http://localhost/FORO/dist/php/channels.php',
+        url: 'http://localhost/FORO2/dist/php/channels.php',
         type: 'POST',
         data: formData,
         processData: false,
@@ -579,7 +550,7 @@ $(document).ready(function () {
 // Función para cargar las categorías en el select desde la base de datos
 function loadCategories() {
     $.ajax({
-        url: 'http://localhost/FORO/dist/php/channels.php?action=getCategories',
+        url: 'http://localhost/FORO2/dist/php/channels.php?action=getCategories',
         type: 'GET',
         dataType: 'json',
         success: function(response) {
@@ -602,36 +573,25 @@ function loadCategories() {
 
 function loadUserChannels() {
     $.ajax({
-        url: 'http://localhost/FORO/dist/php/channels.php',
+        url: 'http://localhost/FORO2/dist/php/channels.php',
         type: 'POST',
         data: {
-            action: 'getChannels' // Eliminar id_admin de aquí
+            action: 'getChannels'
         },
         dataType: 'json',
         success: function(response) {
             if (response.status === 'ok') {
                 const channels = response.data;
-                const recommendedGroup = $(".recommended-group");
                 const containerChannels = $(".container-channels");
 
                 // Limpiar contenido anterior
-                recommendedGroup.empty();
                 containerChannels.empty();
 
-                // Construir canales recomendados y propios
+                // Construir canales propios
                 channels.forEach(channel => {
-                    // Crear elementos de canales recomendados
-                    const recommendedHTML = `
-                        <div class="recommended">
-                            <img src="dist/php/${channel.image}" alt="Logo canal recommended">
-                            <p>${channel.canalname}</p>
-                        </div>
-                    `;
-                    recommendedGroup.append(recommendedHTML);
-
                     // Crear elementos de canales propios
                     const cardChannelHTML = `
-                        <div class="card-channel">
+                        <div class="card-channel" data-id="${channel.id_canal}">
                             <img src="dist/php/${channel.image}" alt="Logo canal card">
                             <h5 class="channel-title">${channel.canalname}</h5>
                             <div class="card-body">
@@ -641,6 +601,17 @@ function loadUserChannels() {
                         </div>
                     `;
                     containerChannels.append(cardChannelHTML);
+                });
+
+                // Asignar evento click a cada tarjeta
+                $(".card-channel").on("click", function () {
+                    const id_canal = $(this).data("id");
+
+                    // Guardar el id_canal en una cookie
+                    document.cookie = `id_canal=${id_canal}; path=/`;
+
+                    // Redirigir a channel.html
+                    window.location.href = "channel.html";
                 });
             } else {
                 showAlert("error", response.message);
@@ -653,16 +624,13 @@ function loadUserChannels() {
     });
 }
 
-// Supongamos que userId ya está definido como una variable global
-// userId = <valor>;
-
 $(document).on("click", ".btn-account", function () {
     // Mostrar el modal
     $("#userModal").css("display", "flex");
 
     // Solicitar datos del usuario
     $.ajax({
-        url: 'http://localhost/FORO/dist/php/getUserInfo.php',
+        url: 'http://localhost/FORO2/dist/php/getUserInfo.php',
         type: 'POST',
         data: { userId: userId }, // Enviar el userId al servidor
         dataType: 'json',
@@ -743,7 +711,7 @@ if (imageFile) {
 
         // Enviar datos al servidor
         $.ajax({
-            url: 'http://localhost/FORO/dist/php/updateUserProfile.php',
+            url: 'http://localhost/FORO2/dist/php/updateUserProfile.php',
             type: 'POST',
             data: formData,
             contentType: false, // Necesario para enviar datos con FormData
@@ -774,8 +742,6 @@ $(document).on("click", ".close-modal", function () {
     $("#userModal").css("display", "none");
 });
 
-
-
 // Cerrar el modal
 $(document).on("click", ".close-modal", function () {
     $("#userModal").fadeOut();
@@ -799,7 +765,7 @@ $(document).ready(function () {
     
         if (query.length > 0) {
             $.ajax({
-                url: "http://localhost/FORO/dist/php/buscarCanales.php", // Archivo PHP para manejar la búsqueda
+                url: "http://localhost/FORO2/dist/php/buscarCanales.php", // Archivo PHP para manejar la búsqueda
                 type: "POST",
                 data: { query: query },
                 dataType: "json",
@@ -832,11 +798,8 @@ $(document).ready(function () {
     
 });
 
-
-
-
-
 // Inicialización al cargar el DOM
 $(document).ready(function () {
     loadUserChannels(); // Cargar canales del usuario
 });
+

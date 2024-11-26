@@ -5,6 +5,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Función para enviar una respuesta JSON consistente
 function jsonResponse($status, $message, $data = null) {
     echo json_encode(['status' => $status, 'message' => $message, 'data' => $data]);
     exit;
@@ -14,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
 
     if ($action === 'addChannel') {
-        // Código existente para agregar canal...
+        // Agregar un nuevo canal
         $canalName = $_POST['canalname'];
         $description = $_POST['description'];
         $numIntegrantes = $_POST['numintegrantes'];
@@ -48,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
         $connection->close();
     } elseif ($action === 'getCategories') {
-        // Código existente para obtener categorías...
+        // Obtener categorías
         $stmt = $connection->prepare("SELECT nombre FROM categorias_canales");
         $stmt->execute();
         $result = $stmt->get_result();
@@ -66,29 +67,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
         $connection->close();
     } elseif ($action === 'getChannels') {
-        // Obtener todos los canales, sin filtrar por id_admin
-        $stmt = $connection->prepare("SELECT canalname, description, numintegrantes, image, category FROM canales");
+        // Obtener todos los canales, incluyendo id_canal
+        $stmt = $connection->prepare("SELECT id_canal, canalname, description, numintegrantes, image, category FROM canales");
         $stmt->execute();
         $result = $stmt->get_result();
-    
+
         if ($result->num_rows > 0) {
             $channels = [];
             while ($row = $result->fetch_assoc()) {
-                $channels[] = $row;
+                $channels[] = [
+                    'id_canal' => $row['id_canal'],
+                    'canalname' => $row['canalname'],
+                    'description' => $row['description'],
+                    'numintegrantes' => $row['numintegrantes'],
+                    'image' => $row['image'],
+                    'category' => $row['category']
+                ];
             }
             jsonResponse('ok', 'Canales obtenidos con éxito.', $channels);
         } else {
             jsonResponse('error', 'No se encontraron canales.');
         }
-    
+
         $stmt->close();
         $connection->close();
-    }
-     else {
+    } else {
         jsonResponse('error', 'Acción no permitida.');
     }
-} else if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'getCategories') {
-    // Código existente para manejar GET de categorías...
+} elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'getCategories') {
+    // Manejar GET para obtener categorías
     $stmt = $connection->prepare("SELECT nombre FROM categorias_canales");
     $stmt->execute();
     $result = $stmt->get_result();

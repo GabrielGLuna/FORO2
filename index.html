@@ -64,19 +64,7 @@
         <div class="channels">
             <h1>Mis canales</h1>
             <div class="container-channels">
-
-                <!-- <div class="card-channel">
-
-                        <img src="dist/php/uploads/imagen.jpg" alt="Logo canal card"> // imagen desde uploads
-                        <h5 class="channel-title">NombreCanal</h5> // canalname
-                        <div class="card-body">
-                            <p class="card-category"><i class='bx bx-category-alt'></i> Category</p> // category
-                            <p class="card-actives">10 Miembros <i class='bx bxs-group'></i></p> // numintegrantes
-                        </div>
-
-                </div> -->
-
-
+                <!-- Contenido dinamico de loadUserChannels -->
             </div>
         </div>
 
@@ -111,7 +99,7 @@
         <div class="search-input-group">
             <i class='bx bx-search'></i>
             <input type="text" id="search-input" placeholder="Buscar un canal..." class="search-input">
-            <button class="close-modal">Cerrar</button>
+            <button class="close-modal" onclick="closeModal();">Cerrar</button>
         </div>
         <div id="search-results" class="search-results">
             <!-- Aquí aparecerán los resultados -->
@@ -147,7 +135,7 @@
     <!-- Modal de Login -->
     <div class="modal-login" id="modal-login">
         <div class="modal-content">
-            <span class="close-btn" id="close-modal">&times;</span>
+            <span class="close-btn" id="close-modalLog">&times;</span>
             <h2>Iniciar Sesión</h2>
             <form>
                 <label for="email">Correo Electrónico:</label>
@@ -189,6 +177,7 @@
     </div>
 
     <!-- Scripts -->
+     <script src="dist/js/sw_theme.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="dist/js/app.js"></script>
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
