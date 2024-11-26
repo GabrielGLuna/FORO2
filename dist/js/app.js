@@ -48,16 +48,19 @@ const btnSearch = document.querySelector('.btn-search');
 const btnSearchResponsive = document.querySelector('.btn-search-responsive');
 const searchInput = document.querySelector('.search-input');
 
+
 // Función para abrir el modal
 const openModal = () => {
     modal.classList.add('active');
     setTimeout(() => searchInput.focus(), 50);
 };
 
+
 // Función para cerrar el modal
 const closeModal = () => {
     modal.classList.remove('active');
 };
+
 
 // Listeners para abrir el modal
 btnSearch.addEventListener('click', openModal);
@@ -91,7 +94,9 @@ const closeModalRegister = document.getElementById('close-register');
 const userButtons = document.querySelectorAll('.btn-user');
 const openRegisterModal = document.getElementById('open-register-modal');
 const backToLogin = document.getElementById('back-to-login');
+const openAcount = document.getElementById('btn-account')
 
+const modalAccount = document.getElementById('userModal');
 const modalAddChannel = document.getElementById('modal-addChannel');
 const closeModalChannel = document.getElementById('close-modalCH');
 const addChannelButtons = document.querySelectorAll('.btn-addChannel');
@@ -112,7 +117,6 @@ userButtons.forEach(button => {
         modalLogin.style.display = 'flex';
     });
 });
-
 // Cerrar modal de login
 closeModalLogin.addEventListener('click', () => {
     modalLogin.style.display = 'none';
@@ -124,10 +128,14 @@ openRegisterModal.addEventListener('click', () => {
     modalRegister.style.display = 'flex';
 });
 
+
+
 // Cerrar modal de registro
 closeModalRegister.addEventListener('click', () => {
     modalRegister.style.display = 'none';
 });
+
+
 
 // Volver al modal de login desde registro
 backToLogin.addEventListener('click', () => {
@@ -214,20 +222,13 @@ function renderMenu() {
         // Reemplazar solo los botones de usuario dinámicos
         rightGroup.innerHTML = `
             <li class="search-container">
-                <button class="btn-search">
-                    <div class="btn-srch-right">
-                        <i class='bx bx-search'></i> Buscar
-                    </div>
-                    <div class="btn-srch-left">
-                        <div class="wnd">
-                            <i class='bx bxl-windows'></i>
-                        </div>
-                        <div class="wnd">
-                            <p>C</p>
-                        </div>
-                    </div>
-                </button>
-            </li>
+    <button id="btn-open-search-modal" class="btn-search search">
+        <div class="btn-srch-right">
+            <i class='bx bx-search'></i> Buscar
+        </div>
+    </button>
+</li>
+
             <li class="icon-search-responsive">
                 <button class="btn-search-responsive"><i class='bx bx-search'></i></button>
             </li>
@@ -312,6 +313,13 @@ function attachDynamicEvents() {
         });
     });
 
+    document.querySelectorAll(".btn-account").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const modalAccount = document.getElementById("userModal");
+            modalAccount.style.display = "flex";
+        });
+    });
+    
     // Botones de tema
     const themeToggleButtons = document.querySelectorAll('.toggle-theme');
     themeToggleButtons.forEach(button => {
@@ -644,6 +652,189 @@ function loadUserChannels() {
         }
     });
 }
+
+// Supongamos que userId ya está definido como una variable global
+// userId = <valor>;
+
+$(document).on("click", ".btn-account", function () {
+    // Mostrar el modal
+    $("#userModal").css("display", "flex");
+
+    // Solicitar datos del usuario
+    $.ajax({
+        url: 'http://localhost/FORO/dist/php/getUserInfo.php',
+        type: 'POST',
+        data: { userId: userId }, // Enviar el userId al servidor
+        dataType: 'json',
+        success: function (response) {
+            if (response.status === 'ok') {
+                // Rellenar el modal con los datos recibidos
+                $("#user-image").attr("src", "dist/php/" + response.data.image);
+                $("#user-name").text(response.data.username);
+                $("#user-email").val(response.data.email); // Establecer valor del input
+                $("#user-phone").val(response.data.telefono); // Establecer valor del input
+                $("#user-channels").val(response.data.canales); // Establecer valor del input
+            } else {
+                alert("Error: " + response.message);
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error("Error en la solicitud AJAX:");
+            console.error("Estado: " + textStatus);
+            console.error("Error: " + errorThrown);
+            console.error("Respuesta del servidor: " + jqXHR.responseText);
+        }
+    });
+});
+
+//editar
+
+$(document).ready(function () {
+    let isEditing = false;
+
+    // Activar edición general
+    $(document).on("click", "#edit-btn", function () {
+        if (!isEditing) {
+            $("#user-email").prop("readonly", false);
+            $("#user-phone").prop("readonly", false);
+            $("#user-channels").prop("readonly", false);
+            $("#edit-btn").hide();
+            $("#save-btn").show();
+            isEditing = true;
+        }
+    });
+
+    // Activar edición de la imagen
+    $(document).on("click", "#edit-image-btn", function () {
+        $("#user-image-input").click();
+    });
+
+    // Previsualizar la imagen seleccionada
+    $(document).on("change", "#user-image-input", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $("#user-image").attr("src", e.target.result); // Mostrar vista previa
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Guardar cambios
+    $(document).on("click", "#save-btn", function () {
+        const formData = new FormData();
+        formData.append("userId", userId);
+        formData.append("email", $("#user-email").val());
+        formData.append("telefono", $("#user-phone").val());
+        formData.append("canales", $("#user-channels").val());
+
+
+        const imageFile = $("#user-image-input")[0].files[0];
+
+if (imageFile) {
+    // Asegúrate de que el archivo seleccionado se envíe con el nombre correcto
+    formData.append("image", imageFile); // Incluir la nueva imagen
+} else {
+    // Enviar el nombre o la ruta de la imagen actual si no se seleccionó una nueva
+    const currentImagePath = $("#user-image").attr("src").replace(/^.*[\\\/]/, ''); // Extraer solo el nombre del archivo
+    formData.append("currentImage", currentImagePath); // Enviar la imagen actual
+}
+
+        // Enviar datos al servidor
+        $.ajax({
+            url: 'http://localhost/FORO/dist/php/updateUserProfile.php',
+            type: 'POST',
+            data: formData,
+            contentType: false, // Necesario para enviar datos con FormData
+            processData: false,
+            success: function (response) {
+                if (response.status === 'ok') {
+                    alert("Perfil actualizado correctamente");
+                    $("#user-email").prop("readonly", true);
+                    $("#user-phone").prop("readonly", true);
+                    $("#user-channels").prop("readonly", true);
+                    $("#save-btn").hide();
+                    $("#edit-btn").show();
+                    isEditing = false;
+                } else {
+                    alert("Error al actualizar el perfil: " + response.message);
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("Error en la solicitud AJAX:");
+                console.error("Estado: " + textStatus);
+                console.error("Error: " + errorThrown);
+            }
+        });
+    });
+});
+// Cerrar el modal
+$(document).on("click", ".close-modal", function () {
+    $("#userModal").css("display", "none");
+});
+
+
+
+// Cerrar el modal
+$(document).on("click", ".close-modal", function () {
+    $("#userModal").fadeOut();
+});
+
+$(document).ready(function () {
+    // Abrir el modal de búsqueda
+    $(document).on("click", "#btn-open-search-modal", function () {
+        $("#modal-search").removeClass("hidden");
+    });
+
+    // Cerrar el modal
+    $(document).on("click", ".close-modal, .modal-overlay", function () {
+        $("#modal-search").addClass("hidden");
+        $("#search-input").val(""); // Limpiar input
+        $("#search-results").html(""); // Limpiar resultados
+    });
+
+    $(document).on("input", "#search-input", function () {
+        const query = $(this).val().trim();
+    
+        if (query.length > 0) {
+            $.ajax({
+                url: "http://localhost/FORO/dist/php/buscarCanales.php", // Archivo PHP para manejar la búsqueda
+                type: "POST",
+                data: { query: query },
+                dataType: "json",
+                success: function (response) {
+                    if (response.status === "ok" && response.data.length > 0) {
+                        let resultsHTML = "";
+                        response.data.forEach((canal) => {
+                            // Construir HTML del resultado con imagen
+                            resultsHTML += `
+                                <div class="search-item">
+                                    <img src="dist/php/${canal.image}" alt="Logo canal" class="search-item-img">
+                                    <p><strong>Canal:</strong> ${canal.canalname}</p>
+                                </div>
+                            `;
+                        });
+                        $("#search-results").html(resultsHTML);
+                    } else {
+                        $("#search-results").html("<p>No se encontraron resultados</p>");
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("Error en la búsqueda:", textStatus, errorThrown);
+                    $("#search-results").html("<p>Error al realizar la búsqueda</p>");
+                }
+            });
+        } else {
+            $("#search-results").html(""); // Limpiar resultados si no hay consulta
+        }
+    });
+    
+});
+
+
+
+
 
 // Inicialización al cargar el DOM
 $(document).ready(function () {

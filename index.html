@@ -81,26 +81,46 @@
         </div>
 
     </div>
-
-    <!-- Modal busqueda -->
-    <div id="modal-search" class="modal hidden">
-        <div class="modal-body">
-            <div class="search-input-group">
-                <i class='bx bx-search'></i>
-                <input type="text" placeholder="Buscar..." class="search-input">
-                <button class="close-modal">esc</button>
-            </div>
-            <div class="categories">
-                <p><i class='bx bx-category-alt'></i> Categoría 1</p>
-                <p><i class='bx bx-category-alt'></i> Categoría 2</p>
-                <p><i class='bx bx-category-alt'></i> Categoría 3</p>
-                <p><i class='bx bx-category-alt'></i> Categoría 4</p>
-                <p><i class='bx bx-category-alt'></i> Categoría 5</p>
+    <!--Modal Account-->
+    <div id="userModal" class="modal-account">
+        <div class="modal-content">
+            <button class="close-btn close-modal">&times;</button>
+            <div class="user-info">
+                <!-- Imagen actual con vista previa -->
+                <img id="user-image" src="" alt="User Image">
+                <input type="file" id="user-image-input" style="display: none;" accept="image/*">
+                <button id="btn-img-edit"><a id="edit-image-btn" class="btn-edit-image readonly">Editar Imagen</a></button>
+                
+                <h2 id="user-name"></h2>
+                <p><strong>Email:</strong> <input type="text" id="user-email" readonly></p>
+                <p><strong>Teléfono:</strong> <input type="text" id="user-phone" readonly></p>
+                <p><strong>Canales:</strong> <input type="text" id="user-channels" readonly></p>
+                
+                <div class="modal-actions">
+                    <button id="edit-btn" class="btn-edit">Editar</button>
+                    <button id="save-btn" class="btn-save" style="display: none;">Guardar Cambios</button>
+                </div>
             </div>
         </div>
-        <div class="modal-overlay"></div>
     </div>
     
+
+<!-- Modal busqueda -->
+<div id="modal-search" class="modal hidden">
+    <div class="modal-body">
+        <div class="search-input-group">
+            <i class='bx bx-search'></i>
+            <input type="text" id="search-input" placeholder="Buscar un canal..." class="search-input">
+            <button class="close-modal">Cerrar</button>
+        </div>
+        <div id="search-results" class="search-results">
+            <!-- Aquí aparecerán los resultados -->
+        </div>
+    </div>
+    <div class="modal-overlay"></div>
+</div>
+
+
     <!-- Modal de Agregar Canales -->
     <div class="modal-addChannel" id="modal-addChannel">
         <div class="modal-content">
