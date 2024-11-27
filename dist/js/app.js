@@ -6,8 +6,6 @@ const btnSearch = document.querySelector('.btn-search');
 const btnSearchResponsive = document.querySelector('.btn-search-responsive');
 const searchInput = document.querySelector('.search-input'); // Selección del input
 
-
-
 // Función para abrir el modal
 const openModal = () => {
     modalSearch.classList.add('active');
@@ -145,11 +143,12 @@ function setCookie(name, value, days) {
     document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
 }
 
+// Función para obtener cookies
 function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
-    return null; // Retorna null si no encuentra la cookie
+    return null;
 }
 
 // Función para eliminar cookies
@@ -573,15 +572,16 @@ function loadCategories() {
 }
 
 function loadUserChannels() {
+    idUser= getCookie("iduser");
     $.ajax({
         url: 'http://localhost/FORO2/dist/php/channels.php',
         type: 'POST',
         data: {
-            action: 'getChannels'
+            action: 'getChannels', idUser: idUser
         },
         dataType: 'json',
         success: function(response) {
-            if (response.status === 'ok') {
+            if (response.success) {
                 const channels = response.data;
                 const containerChannels = $(".container-channels");
 
@@ -589,7 +589,7 @@ function loadUserChannels() {
                 containerChannels.empty();
 
                 // Construir canales propios
-                channels.forEach(channel => {
+                response.list.forEach(channel => {
                     // Crear elementos de canales propios
                     const cardChannelHTML = `
                         <div class="card-channel" data-id="${channel.id_canal}">
@@ -619,8 +619,8 @@ function loadUserChannels() {
             }
         },
         error: function(error) {
+            console.error(response);
             showAlert("error", "Error en la solicitud.");
-            console.error(error);
         }
     });
 }
@@ -798,83 +798,6 @@ $(document).ready(function () {
     });
     
 });
-
- // 7 días de duración, accesible en todo el sitio
-
-
-document.addEventListener('DOMContentLoaded', function () {
-    document.body.addEventListener('click', function (event) {
-        if (event.target.id === 'joinButton') {
-            const id_canal = getCookie('id_canal')
-            const userId = getCookie('iduser');
-            console.log({ iduser: userId, id_canal: id_canal }); // Verifica en la consola que se envían correctamente
-
-            if (userId) {
-                console.log(`Cookie userId encontrada: ${userId}`);
-                fetch('http://localhost/FORO2/dist/php/guardar_canal.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ iduser: userId, id_canal: id_canal })
-                    
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'ok') {
-                        alert('Canal añadido correctamente');
-                    } else {
-                        alert(`Error: ${data.message}`);
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            } else {
-                console.error('Cookie userId no encontrada');
-                console.log('Cookies actuales:', document.cookie);
-            }
-            
-        }
-    });
-});
-
-
-
-
-
-function cargarCanales() {
-    const userId = getCookie('iduser');
-    const canal_id = getCookie('id_canal'); // Leer ID de usuario de las cookies
-
-    if (userId) {
-        fetch('obtener_canales.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ userId: userId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'ok') {
-                const canales = data.canales;
-                const canalesContainer = document.getElementById('canalesContainer');
-                canalesContainer.innerHTML = '';
-
-                canales.forEach(id_canal => {
-                    const canalElement = document.createElement('div');
-                    canalElement.textContent = `Canal ID: ${id_canal}`;
-                    canalesContainer.appendChild(canalElement);
-                });
-            } else {
-                console.error(`Error: ${data.message}`);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    } else {
-        console.error('No se pudo obtener el ID del usuario');
-    }
-}
-
 
 // Inicialización al cargar el DOM
 $(document).ready(function () {

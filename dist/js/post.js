@@ -206,7 +206,6 @@ function loadSidebarChannels() {
         },
         error: function (error) {
             console.error("Error en la solicitud:", error);
-            alert("Error al cargar los canales.");
         }
     });
 }

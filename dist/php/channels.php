@@ -37,17 +37,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // Insertar el nuevo canal
         $stmt = $connection->prepare("INSERT INTO canales (canalname, description, numintegrantes, image, category, id_admin) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssissi", $canalName, $description, $numIntegrantes, $imagePath, $category, $idAdmin);
 
         if ($stmt->execute()) {
-            jsonResponse('ok', 'Canal creado exitosamente.');
+            // Obtener el ID del canal recién creado
+            $canalId = $stmt->insert_id;
+
+            // Actualizar la tabla usuarios para agregar el canal al idAdmin
+            $updateStmt = $connection->prepare("UPDATE usuario SET canales = CONCAT(IFNULL(canales, ''),?, ',') WHERE iduser = ?");
+            $updateStmt->bind_param("ii", $canalId, $idAdmin);
+
+            if ($updateStmt->execute()) {
+                jsonResponse('ok', 'Canal creado y asignado exitosamente.');
+            } else {
+                jsonResponse('error', 'Error al asignar el canal al administrador: ' . $updateStmt->error);
+            }
+
+            $updateStmt->close();
         } else {
             jsonResponse('error', 'Error al crear el canal: ' . $stmt->error);
         }
 
         $stmt->close();
         $connection->close();
+
     } elseif ($action === 'getCategories') {
         // Obtener categorías
         $stmt = $connection->prepare("SELECT nombre FROM categorias_canales");
@@ -67,30 +82,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
         $connection->close();
     } elseif ($action === 'getChannels') {
-        // Obtener todos los canales, incluyendo id_canal
-        $stmt = $connection->prepare("SELECT id_canal, canalname, description, numintegrantes, image, category FROM canales");
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $channels = [];
-            while ($row = $result->fetch_assoc()) {
-                $channels[] = [
-                    'id_canal' => $row['id_canal'],
-                    'canalname' => $row['canalname'],
-                    'description' => $row['description'],
-                    'numintegrantes' => $row['numintegrantes'],
-                    'image' => $row['image'],
-                    'category' => $row['category']
-                ];
+        $idUser=$_POST['idUser'] ?? null;
+        if (!empty($idUser)) {
+            $sql1 = "SELECT canales FROM usuario WHERE iduser = ?";
+            $stmt1 = $connection->prepare($sql1);
+            $stmt1->bind_param("i", $idUser);       
+            if ($stmt1->execute()) {
+                $result1 = $stmt1->get_result();
+                if ($result1->num_rows > 0) {
+                    $row = $result1->fetch_assoc();
+                    $canales = rtrim($row['canales'], ',');
+                    if (!empty($canales)) {
+                        $sql2 = "SELECT * FROM canales WHERE id_canal IN ($canales)";
+                        $stmt2 = $connection->prepare($sql2);
+                        if ($stmt2->execute()) {
+                            $result2 = $stmt2->get_result();
+                            $lista_canales = [];
+                            while ($canal = $result2->fetch_assoc()) {
+                                $lista_canales[] = $canal;
+                            }
+                            //jsonResponse('ok', 'Categorías obtenidas con éxito.', $lista_canales[]);
+                            echo json_encode(["success" => true, "list" => $lista_canales]);
+                        }
+                        $stmt2->close();
+                    }
+                }
             }
-            jsonResponse('ok', 'Canales obtenidos con éxito.', $channels);
-        } else {
-            jsonResponse('error', 'No se encontraron canales.');
+            $stmt1->close();
         }
-
-        $stmt->close();
-        $connection->close();
     } else {
         jsonResponse('error', 'Acción no permitida.');
     }
