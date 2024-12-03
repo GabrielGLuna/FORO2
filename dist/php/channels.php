@@ -15,7 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
 
     if ($action === 'addChannel') {
-        // Agregar un nuevo canal
         $canalName = $_POST['canalname'];
         $description = $_POST['description'];
         $numIntegrantes = $_POST['numintegrantes'];
@@ -37,15 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Insertar el nuevo canal
         $stmt = $connection->prepare("INSERT INTO canales (canalname, description, numintegrantes, image, category, id_admin) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssissi", $canalName, $description, $numIntegrantes, $imagePath, $category, $idAdmin);
 
         if ($stmt->execute()) {
-            // Obtener el ID del canal recién creado
             $canalId = $stmt->insert_id;
-
-            // Actualizar la tabla usuarios para agregar el canal al idAdmin
             $updateStmt = $connection->prepare("UPDATE usuario SET canales = CONCAT(IFNULL(canales, ''),?, ',') WHERE iduser = ?");
             $updateStmt->bind_param("ii", $canalId, $idAdmin);
 
@@ -64,7 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $connection->close();
 
     } elseif ($action === 'getCategories') {
-        // Obtener categorías
         $stmt = $connection->prepare("SELECT nombre FROM categorias_canales");
         $stmt->execute();
         $result = $stmt->get_result();
@@ -82,39 +76,101 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
         $connection->close();
     } elseif ($action === 'getChannels') {
-        $idUser=$_POST['idUser'] ?? null;
-        if (!empty($idUser)) {
+        $idUser = $_POST['idUser'] ?? null;
+
+        if ($idUser) {
             $sql1 = "SELECT canales FROM usuario WHERE iduser = ?";
             $stmt1 = $connection->prepare($sql1);
-            $stmt1->bind_param("i", $idUser);       
+            $stmt1->bind_param("i", $idUser);
+
             if ($stmt1->execute()) {
                 $result1 = $stmt1->get_result();
+
                 if ($result1->num_rows > 0) {
                     $row = $result1->fetch_assoc();
                     $canales = rtrim($row['canales'], ',');
+
                     if (!empty($canales)) {
                         $sql2 = "SELECT * FROM canales WHERE id_canal IN ($canales)";
                         $stmt2 = $connection->prepare($sql2);
+
                         if ($stmt2->execute()) {
                             $result2 = $stmt2->get_result();
                             $lista_canales = [];
                             while ($canal = $result2->fetch_assoc()) {
                                 $lista_canales[] = $canal;
                             }
-                            //jsonResponse('ok', 'Categorías obtenidas con éxito.', $lista_canales[]);
-                            echo json_encode(["success" => true, "list" => $lista_canales]);
+                            jsonResponse('ok', 'Canales obtenidos con éxito.', $lista_canales);
                         }
                         $stmt2->close();
+                    } else {
+                        jsonResponse('ok', 'No está unido a ningún canal.', []);
                     }
                 }
             }
             $stmt1->close();
         }
+    } elseif ($action === 'getAllChannels') {
+        $sql = "SELECT * FROM canales";
+        $result = $connection->query($sql);
+
+        if ($result->num_rows > 0) {
+            $allChannels = [];
+            while ($canal = $result->fetch_assoc()) {
+                $allChannels[] = $canal;
+            }
+            jsonResponse('ok', 'Todos los canales obtenidos con éxito.', $allChannels);
+        } else {
+            jsonResponse('error', 'No hay canales disponibles.');
+        }
+    } elseif ($action === 'joinChannel') {
+        // Corrección implementada aquí
+        $idUser = $_POST['idUser'] ?? null;
+        $idCanal = $_POST['idCanal'] ?? null;
+
+        if ($idUser && $idCanal) {
+            $sql1 = "SELECT canales FROM usuario WHERE iduser = ?";
+            $stmt1 = $connection->prepare($sql1);
+            $stmt1->bind_param("i", $idUser);
+
+            if ($stmt1->execute()) {
+                $result1 = $stmt1->get_result();
+
+                if ($result1->num_rows > 0) {
+                    $row = $result1->fetch_assoc();
+                    $canales = trim($row['canales'], ',');
+                    $canalesArray = empty($canales) ? [] : explode(',', $canales);
+
+                    if (!in_array($idCanal, $canalesArray)) {
+                        $canalesArray[] = $idCanal;
+                        sort($canalesArray);
+                        $newCanales = implode(',', $canalesArray);
+
+                        $sql2 = "UPDATE usuario SET canales = ? WHERE iduser = ?";
+                        $stmt2 = $connection->prepare($sql2);
+                        $stmt2->bind_param("si", $newCanales, $idUser);
+
+                        if ($stmt2->execute()) {
+                            jsonResponse('ok', 'Te has unido al canal exitosamente.');
+                        } else {
+                            jsonResponse('error', 'Error al actualizar los canales: ' . $stmt2->error);
+                        }
+                        $stmt2->close();
+                    } else {
+                        jsonResponse('error', 'Ya estás unido a este canal.');
+                    }
+                }
+                $stmt1->close();
+            } else {
+                jsonResponse('error', 'Error al obtener los canales actuales.');
+            }
+        } else {
+            jsonResponse('error', 'Faltan parámetros (idUser o idCanal).');
+        }
     } else {
         jsonResponse('error', 'Acción no permitida.');
     }
 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'getCategories') {
-    // Manejar GET para obtener categorías
     $stmt = $connection->prepare("SELECT nombre FROM categorias_canales");
     $stmt->execute();
     $result = $stmt->get_result();

@@ -5,7 +5,7 @@ window.onload = function() {
     loadPosts();
 };
 
-// Obtener elementos de la ventana emergente
+// Obtener elementos de la ventana emergente 
 const modal = document.getElementById("commentModal");
 const closeBtn = document.querySelector(".close-btn");
 const existingComments = document.querySelector(".existing-comments");
@@ -23,15 +23,13 @@ postsContainer.addEventListener('click', (event) => {
     } else if (event.target.closest('.comment-button')) {
         const postId = event.target.closest('.comment-button').getAttribute('data-id');
         commentPost(postId, event.target.closest('.comment-button'))
-        modal.style.display = "block";
-        console.log("hiciste clic en comentar");
+        modal.style.display = "flex";
     }
 });
 
 //maneja los clicks en la seccion de comentarios
 modal.addEventListener('click', (event)=>{
     if(event.target.closest('#submit-comment')){  
-        console.log("presionaste comentar");
         var data = event.target.closest('#submit-comment').getAttribute('data-id');
         var dataId = data.split(',');
         var idUser = dataId[0];
@@ -118,14 +116,14 @@ function loadPosts() {
                                 </div>
                                 <div class="interaction-post">
                                 <button class="like-button" data-id="${post.id_post}">
+                                <span>${post.likes} </span>
                                 <i class='${button}'></i>
-                                <span> Likes ${post.likes}</span>
                                 </button>
                                 <button class="comment-button" data-id="${post.id_post}">
-                                        <i class='bx bx-comment-detail'></i>Comentar
+                                        <i class='bx bx-comment-detail'></i>
                                     </button>
                                     <button>
-                                        <i class='bx bx-share-alt'></i> Compartir
+                                        <i class='bx bx-share-alt'></i>
                                     </button>
                                 </div>
                             </div>
@@ -256,12 +254,12 @@ function likePost(postId, button) {
                 console.log('Like añadido correctamente');
                 const newLikes = response.new_likes || 1;
                 button.querySelector('i').className = 'bx bxs-like';
-                button.querySelector('span').textContent = ` Likes ${newLikes}`;
+                button.querySelector('span').textContent = `${newLikes} `;
 
             } else {
                 const newLikes = response.new_likes;
                 button.querySelector('i').className = 'bx bx-like';
-                button.querySelector('span').textContent = ` Likes ${newLikes}`;
+                button.querySelector('span').textContent = `${newLikes} `;
                 console.error('Error al añadir el like: ya diste like');
             }
         },
@@ -283,12 +281,12 @@ function likeComment(idComment, button) {
                 console.log('Like añadido correctamente');
                 const newLikes = response.new_noLikes || 1;
                 button.querySelector('i').className = 'bx bxs-like';
-                button.querySelector('span').textContent = ` Likes ${newLikes}`;
+                button.querySelector('span').textContent = `${newLikes} `;
 
             } else {
                 const newLikes = response.new_noLikes;
                 button.querySelector('i').className = 'bx bx-like';
-                button.querySelector('span').textContent = ` Likes ${newLikes}`;
+                button.querySelector('span').textContent = `${newLikes} `;
                 console.error('Error al añadir el like: ya diste like');
             }
         },
@@ -297,56 +295,47 @@ function likeComment(idComment, button) {
         }
     });
 }
-function commentPost(postId, button) {  
-    idUser= getCookie("iduser");
-    var postHTML = `<div id="comment-group">
-                    <div id="existing-comments" >
-                        <!-- Aquí se mostrarán comentarios existentes -->
-                        <p>No hay comentarios aún. ¡Sé el primero en comentar!</p>
-                    </div>
-                    <div class="add-comment">
-                    <textarea placeholder="Escribe tu comentario aquí..." id="comment-input"></textarea>
-                    <button id="submit-comment" data-id="${idUser},${postId}">comentar</button>                                        
-                    </div>
-                    </div>
-                    `;
-                    // Agregar el nuevo post al contenedor
-                    document.getElementById('comments-part').innerHTML += postHTML;
-                    console.log(modal.style.display);
-                    $.ajax({
-                        url: 'dist/php/post.php',
-                        type: 'POST',
-                        data: { action: 'comment', id_post: postId },
-                        dataType: 'json',
-                        success: function (response) {
-                            if (response.success) {
-                                var commentsContainer = document.getElementById('existing-comments');
-                                commentsContainer.innerHTML = ''; // Limpiar el contenido
-                console.log("respuesta:", iduser);
-                
-                
-                
-                // Recorrer y mostrar cada comentario
-                response.comments.forEach(comments => {
+function commentPost(postId, button) {
+    idUser = getCookie("iduser");
 
-                    var likesArray = comments.likes;
-                      console.log("esto devuelve:", likesArray);
-                        var button;
-        
-                        if (likesArray.includes(iduser.toString())) {
-                            button= "bx bxs-like";
-                        }else{
-                            button= "bx bx-like";
-                        }
+    const commentHTML = `
+        <div id="existing-comments" class="existing-comments">
+            <!-- Aquí se mostrarán comentarios existentes -->
+            <p>No hay comentarios aún. ¡Sé el primero en comentar!</p>
+        </div>
+        <div class="add-comment">
+            <textarea placeholder="Escribe tu comentario aquí..." id="comment-input" class="comment-input"></textarea>
+            <button id="submit-comment" data-id="${idUser},${postId}">Comentar</button>
+        </div>
+    `;
+
+    document.getElementById('comments-part').innerHTML = commentHTML;
+
+    $.ajax({
+        url: 'dist/php/post.php',
+        type: 'POST',
+        data: { action: 'comment', id_post: postId },
+        dataType: 'json',
+        success: function (response) {
+            if (response.success) {
+                const commentsContainer = document.getElementById('existing-comments');
+                commentsContainer.innerHTML = ''; // Limpiar el contenido
+
+                response.comments.forEach(comment => {
+                    const isLiked = comment.likes.includes(idUser.toString());
+                    const likeButtonClass = isLiked ? "bx bxs-like" : "bx bx-like";
 
                     commentsContainer.innerHTML += `
-                    <div class="comment" style="display:flex; flex-direction:row; justify-content: space-between;">
-                    <p><strong>${comments.username}:</strong> ${comments.contenido}</p>
-                    <button class="like-button-comment" data-id="${comments.id_comentario}" id="submit-comment-like">
-                                <i class='${button}'></i>
-                                <span> Likes ${comments.noLikes}</span>
-                                </button>
-                    </div>
+                        <div class="comment">
+                            <div class="cont-of-comment">
+                                <h1><strong>${comment.username}</strong></h1>
+                                <p> ${comment.contenido}</p>
+                            </div>
+                            <button class="like-button-comment" data-id="${comment.id_comentario}" id="submit-comment-like">
+                            <span>${comment.noLikes} </span>
+                                <i class="${likeButtonClass}"></i>
+                            </button>
+                        </div>
                     `;
                 });
             } else {
@@ -354,33 +343,75 @@ function commentPost(postId, button) {
             }
         },
         error: function (xhr, status, error) {
-            console.error('Error en la solicitud en esta parte:', error);
+            console.error('Error en la solicitud:', error);
         }
-    });    
+    });
 }
 
 function sendComment(postId, idUser) {
-    var comment = document.getElementById("comment-input").value;
-            console.log("esto es el coment", comment);
-            document.getElementById("comment-input").value="";            
-            $.ajax({
-                url: 'dist/php/post.php',
-                type: 'POST',
-                data: { action: 'sendComment', id_post: postId, idUser: idUser, comment:comment },
-                dataType: 'json',
-                success: function(response){
-                    if (response.success) {
-                        console.log("si jalo w");
-                        document.getElementById("comment-input").value = "";
-                        comment = document.getElementById("comment-input").value;
-                        var group = document.getElementById('comment-group');
-                        group.remove();
-                        commentPost(postId);
-                    }
-                },
-                error: function nojalo(error) {
+    const commentInput = document.getElementById("comment-input");
+    const comment = commentInput.value.trim();
+
+    if (comment === "") {
+        alert("El comentario no puede estar vacío.");
+        return;
+    }
+
+    console.log("Esto es el comentario:", comment);
+    commentInput.value = ""; // Limpia el campo de texto
+
+    $.ajax({
+        url: 'dist/php/post.php',
+        type: 'POST',
+        data: { action: 'sendComment', id_post: postId, idUser: idUser, comment: comment },
+        dataType: 'json',
+        success: function (response) {
+            if (response.success) {
+                console.log("Comentario enviado con éxito.");
+
+                // Datos del comentario recién creado
+                const newComment = response.comment;
+
+                if (newComment) {
+                    const commentsContainer = document.getElementById("existing-comments");
+
+                    // Crear el nuevo comentario
+                    const newCommentHTML = `
+                        <div class="comment">
+                            <div class="cont-of-comment">
+                            <h1><strong>${newComment.username}</strong></h1>
+                            <p> ${newComment.contenido}</p>
+                            </div>
+                            <button class="like-button-comment" data-id="${newComment.id_comentario}" id="submit-comment-like">
+                                <i class="bx bx-like"></i>
+                                <span>${newComment.likes}</span>
+                            </button>
+                        </div>
+                    `;
+                    commentsContainer.innerHTML += newCommentHTML;
+
+                    // Seleccionar el nuevo comentario
+                    const lastComment = commentsContainer.lastElementChild;
+
+                    // Aplicar el resaltado temporal
+                    lastComment.classList.add("highlight");
+                    lastComment.scrollIntoView({ behavior: "smooth", block: "start" });
+
+                    // Eliminar el resaltado después de 3 segundos
+                    setTimeout(() => {
+                        lastComment.classList.remove("highlight");
+                    }, 3000);
+                } else {
+                    console.error("No se recibió información del nuevo comentario.");
                 }
-            });
+            } else {
+                console.error("Error al enviar el comentario:", response.error || response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error en la solicitud AJAX:", error);
+        }
+    });
 }
 
 function sendMessage() {

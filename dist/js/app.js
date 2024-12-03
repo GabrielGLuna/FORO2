@@ -4,7 +4,7 @@ const modalOverlay = document.querySelector('.modal-overlay');
 const closeModalButton = document.querySelector('.close-modal');
 const btnSearch = document.querySelector('.btn-search');
 const btnSearchResponsive = document.querySelector('.btn-search-responsive');
-const searchInput = document.querySelector('.search-input'); // Selección del input
+const searchInput = document.querySelector('.search-input'); // Selección del input 
 
 // Función para abrir el modal
 const openModal = () => {
@@ -108,6 +108,9 @@ window.addEventListener('click', (event) => {
     }
     if (event.target === modalAddChannel) {
         modalAddChannel.style.display = 'none';
+    }
+    if (event.target === modalAccount) {
+        modalAccount.style.display = 'none';
     }
 });
 
@@ -571,59 +574,154 @@ function loadCategories() {
     });
 }
 
-function loadUserChannels() {
-    idUser= getCookie("iduser");
+let userChannels = []; // Array para almacenar los canales del usuario
+
+// Función para cargar los canales del usuario al inicio
+function fetchUserChannels() {
+    const idUser = getCookie("iduser");
+
     $.ajax({
         url: 'http://localhost/FORO2/dist/php/channels.php',
         type: 'POST',
-        data: {
-            action: 'getChannels', idUser: idUser
-        },
+        data: { action: "getChannels", idUser },
         dataType: 'json',
         success: function(response) {
-            if (response.success) {
+            if (response.status === 'ok' && response.data.length > 0) {
+                // Guardar los IDs de los canales en userChannels
+                userChannels = response.data.map(channel => channel.id_canal);
+            } else {
+                console.log("El usuario no está unido a ningún canal.");
+            }
+        },
+        error: function(error) {
+            console.error("Error al cargar los canales del usuario:", error);
+        }
+    });
+}
+
+// Función para manejar el clic en una tarjeta de canal
+function handleChannelClick(id_canal) {
+    if (userChannels.includes(id_canal)) {
+        // Si el usuario ya pertenece al canal, redirige directamente
+        document.cookie = `id_canal=${id_canal}; path=/`;
+        window.location.href = "channel.html";
+    } else {
+        // Mostrar alerta con SweetAlert
+        Swal.fire({
+            title: '¿Deseas unirte al canal?',
+            text: "No perteneces a este canal, ¿quieres unirte?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const idUser = getCookie("iduser");
+
+                // Enviar solicitud para unir al usuario al canal
+                $.ajax({
+                    url: 'http://localhost/FORO2/dist/php/channels.php',
+                    type: 'POST',
+                    data: {
+                        action: 'joinChannel',
+                        idUser: idUser,
+                        idCanal: id_canal
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'ok') {
+                            // Actualizar el array de canales del usuario
+                            userChannels.push(id_canal);
+
+                            // Redirigir al canal
+                            document.cookie = `id_canal=${id_canal}; path=/`;
+                            window.location.href = "channel.html";
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function(error) {
+                        console.error("Error al unirse al canal:", error);
+                        Swal.fire('Error', 'No se pudo procesar la solicitud.', 'error');
+                    }
+                });
+            }
+        });
+    }
+}
+
+// Modificar la asignación de eventos en `loadUserChannels`
+function loadUserChannels(type = "following") {
+    const action = type === "all" ? "getAllChannels" : "getChannels";
+    const idUser = getCookie("iduser");
+
+    $.ajax({
+        url: 'http://localhost/FORO2/dist/php/channels.php',
+        type: 'POST',
+        data: { action, idUser },
+        dataType: 'json',
+        success: function(response) {
+            const containerChannels = $(".container-channels");
+            containerChannels.empty(); // Limpiar contenido anterior
+
+            if (response.status === 'ok') {
                 const channels = response.data;
-                const containerChannels = $(".container-channels");
 
-                // Limpiar contenido anterior
-                containerChannels.empty();
-
-                // Construir canales propios
-                response.list.forEach(channel => {
-                    // Crear elementos de canales propios
-                    const cardChannelHTML = `
-                        <div class="card-channel" data-id="${channel.id_canal}">
-                            <img src="dist/php/${channel.image}" alt="Logo canal card">
-                            <h5 class="channel-title">${channel.canalname}</h5>
-                            <div class="card-body">
-                                <p class="card-category"><i class='bx bx-category-alt'></i> ${channel.category}</p>
-                                <p class="card-actives">${channel.numintegrantes} Miembros <i class='bx bxs-group'></i></p>
+                if (channels.length > 0) {
+                    channels.forEach(channel => {
+                        const cardChannelHTML = `
+                            <div class="card-channel" data-id="${channel.id_canal}">
+                                <img src="dist/php/${channel.image}" alt="Logo canal card">
+                                <h5 class="channel-title">${channel.canalname}</h5>
+                                <div class="card-body">
+                                    <p class="card-category"><i class='bx bx-category-alt'></i> ${channel.category}</p>
+                                    <p class="card-actives">${channel.numintegrantes} Miembros <i class='bx bxs-group'></i></p>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                    containerChannels.append(cardChannelHTML);
-                });
+                        `;
+                        containerChannels.append(cardChannelHTML);
+                    });
 
-                // Asignar evento click a cada tarjeta
-                $(".card-channel").on("click", function () {
-                    const id_canal = $(this).data("id");
-
-                    // Guardar el id_canal en una cookie
-                    document.cookie = `id_canal=${id_canal}; path=/`;
-
-                    // Redirigir a channel.html
-                    window.location.href = "channel.html";
-                });
+                    // Asignar evento click a cada tarjeta
+                    $(".card-channel").on("click", function () {
+                        const id_canal = parseInt($(this).data("id")); // Convertir a número
+                        handleChannelClick(id_canal); // Verificar pertenencia
+                    });
+                } else {
+                    containerChannels.append("<p>No hay canales disponibles.</p>");
+                }
             } else {
                 showAlert("error", response.message);
             }
         },
         error: function(error) {
-            console.error(response);
-            showAlert("error", "Error en la solicitud.");
+            console.error("Error al cargar los canales:", error);
         }
     });
 }
+
+// Llamar a fetchUserChannels al cargar la página
+$(document).ready(function() {
+    fetchUserChannels(); // Obtener los canales del usuario
+});
+
+$(document).ready(function() {
+    // Cargar por defecto los canales "Siguiendo"
+    loadUserChannels("following");
+
+    // Evento para alternar entre "Para ti" y "Siguiendo"
+    $(".btns-content button").on("click", function() {
+        $(".btns-content button").removeClass("section-feed-active");
+        $(this).addClass("section-feed-active");
+
+        if ($(this).text() === "Para ti") {
+            loadUserChannels("all");
+        } else {
+            loadUserChannels("following");
+        }
+    });
+});
 
 $(document).on("click", ".btn-account", function () {
     // Mostrar el modal
@@ -698,42 +796,58 @@ $(document).ready(function () {
         formData.append("telefono", $("#user-phone").val());
         formData.append("canales", $("#user-channels").val());
 
-
         const imageFile = $("#user-image-input")[0].files[0];
 
-if (imageFile) {
-    // Asegúrate de que el archivo seleccionado se envíe con el nombre correcto
-    formData.append("image", imageFile); // Incluir la nueva imagen
-} else {
-    // Enviar el nombre o la ruta de la imagen actual si no se seleccionó una nueva
-    const currentImagePath = $("#user-image").attr("src").replace(/^.*[\\\/]/, ''); // Extraer solo el nombre del archivo
-    formData.append("currentImage", currentImagePath); // Enviar la imagen actual
-}
+        if (imageFile) {
+            formData.append("image", imageFile);
+        } else {
+            const currentImagePath = $("#user-image").attr("src").replace(/^.*[\\\/]/, '');
+            formData.append("currentImage", currentImagePath);
+        }
 
         // Enviar datos al servidor
         $.ajax({
             url: 'http://localhost/FORO2/dist/php/updateUserProfile.php',
             type: 'POST',
             data: formData,
-            contentType: false, // Necesario para enviar datos con FormData
+            contentType: false,
             processData: false,
             success: function (response) {
                 if (response.status === 'ok') {
-                    alert("Perfil actualizado correctamente");
-                    $("#user-email").prop("readonly", true);
-                    $("#user-phone").prop("readonly", true);
-                    $("#user-channels").prop("readonly", true);
-                    $("#save-btn").hide();
-                    $("#edit-btn").show();
-                    isEditing = false;
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Perfil actualizado',
+                        text: 'Perfil actualizado correctamente',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        $("#user-email").prop("readonly", true);
+                        $("#user-phone").prop("readonly", true);
+                        $("#user-channels").prop("readonly", true);
+                        $("#save-btn").hide();
+                        $("#edit-btn").show();
+                        isEditing = false;
+                        $("#userModal").css("display", "none");
+                        $("#userModal").fadeOut();
+                    });
                 } else {
-                    alert("Error al actualizar el perfil: " + response.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al actualizar el perfil: ' + response.message,
+                    });
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 console.error("Error en la solicitud AJAX:");
                 console.error("Estado: " + textStatus);
                 console.error("Error: " + errorThrown);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de red',
+                    text: 'No se pudo conectar con el servidor. Inténtalo de nuevo más tarde.',
+                });
             }
         });
     });
